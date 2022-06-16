@@ -6,13 +6,13 @@ authors = ["Kiran Shila <me@kiranshila.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.9"
+xml2vhdl-ox = {path = "xml2vhdl/scripts/python/xml2vhdl-ox/"}
+numpy = "^1.22.4"
 colorlog = "^6.6.0"
 pyaml = "^21.10.1"
 odict = "^1.9.0"
 lxml = "^4.9.0"
-numpy = "^1.22.4"
-xml2vhdl-ox = {path = "xml2vhdl/scripts/python/xml2vhdl-ox/"}
 
 [tool.poetry.dev-dependencies]
 

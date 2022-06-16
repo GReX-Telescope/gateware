@@ -84,8 +84,8 @@ url = "xml2vhdl/scripts/python/xml2vhdl-ox"
 
 [metadata]
 lock-version = "1.1"
-python-versions = "^3.10"
-content-hash = "c6e6ce4563dcd8b639533ce6df0e4bb1b1e33432dde4b2c76547b68392fc3885"
+python-versions = "^3.9"
+content-hash = "cc251bb2b6414b3239cc1cc48a08c7db200d1f7791d9e6023c227d115eaaece3"
 
 [metadata.files]
 colorama = [

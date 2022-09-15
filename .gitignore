@@ -10,3 +10,4 @@ grex_gateware/
 *.egg
 build
 htmlcov
+casper_venv/

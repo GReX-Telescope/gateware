@@ -1,37 +1,30 @@
 # gateware
+
 Simulink model for the SNAP Gateware for the GReX Telescope
 
 ## Compiling the Model
 
-To compile this model, the machine need to be setup very specifically. I tried to get things to work with docker or otherwise, but it's a nightmare. Just make a VM with
-- Ubuntu 16.04
-- MATLAB 2018a installed to /opt/MATLAB/R2018a
-- Vivado 2019.1 installed to /opt/Xilinx/Vivado/2019.1
-- Python 3.9.7 (I used pyenv for this)
-- Poetry
+To compile this model, the machine need to be setup very specifically. Follow
+the CASPER docs for more info, but I managed to get things working on Arch Linux
+without _too_ much fuss. You'll nneed the following:
+
+- MATLAB 2021a installed to /opt/MATLAB/R2021a
+- Vivado 2021.1 installed to /opt/Xilinx/Vivado/2021.1 with Vitis and Model Composer
+- A venv in the source directory with the casper tools installed
 
 After you do that, make sure you get a license for Vivado and install according to the CASPER docs.
 
 ### Setup
 
 First grab this repo and the submodules
+
 ```sh
 git clone https://github.com/GReX-Telescope/gateware --recurse-submodules
 ```
 
-Install all the python deps
-```sh
-poetry install
-```
-
 ### Compile
 
-To run the existing model, simply
-```sh
-./compile_design.sh
-```
-
-There is another script, `start_toolflow.sh` which will bring up MATLAB to work on the design.
+To run the existing model, open the simulink model in MATLAB and run `jasper`
 
 ## Artifacts
 

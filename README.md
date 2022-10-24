@@ -4,15 +4,7 @@ Simulink model for the SNAP Gateware for the GReX Telescope
 
 ## Compiling the Model
 
-To compile this model, the machine need to be setup very specifically. Follow
-the CASPER docs for more info, but I managed to get things working on Arch Linux
-without _too_ much fuss. You'll nneed the following:
-
-- MATLAB 2021a installed to /opt/MATLAB/R2021a
-- Vivado 2021.1 installed to /opt/Xilinx/Vivado/2021.1 with Vitis and Model Composer
-- A venv in the source directory with the casper tools installed
-
-After you do that, make sure you get a license for Vivado and install according to the CASPER docs.
+I was provided a machine that had MATLAB r2019a and Vivado 2019.1 installed on it, which are setup and required per the CASPER docs. You'll have to replicate this setup somehow to compile on your own.
 
 ### Setup
 
@@ -21,6 +13,16 @@ First grab this repo and the submodules
 ```sh
 git clone https://github.com/GReX-Telescope/gateware --recurse-submodules
 ```
+
+Then create the python virtualenv, start it up, and install the dependencies
+
+```sh
+cd gateware
+python3 -m venv ./casper_venv
+source casper_venv/bin/activate
+pip3 install -r mlib_devel/requirements.txt
+```
+
 
 ### Compile
 

@@ -3,11 +3,10 @@ from amaranth import Signal, Module, Elaboratable, Cat, Const, ClockDomain
 from amaranth.lib.fifo import SyncFIFOBuffered
 from amaranth.sim import Simulator
 from amaranth.back import verilog
-from pytest import yield_fixture
 
 
 class PacketizerState(Enum):
-    WaitRst = 0
+    WaitArm = 0
     WaitSync = 1
     Running = 2
 
@@ -24,7 +23,7 @@ class Packetizer(Elaboratable):
     def __init__(self, n_words: int):
         # Input Ports
         self.ce = Signal()
-        self.rst = Signal()
+        self.arm = Signal()
         self.sync_in = Signal()
         # Packed 8+8 bit Fix8_7 complex numbers
         self.ch_a_in = Signal(16)
@@ -50,7 +49,7 @@ class Packetizer(Elaboratable):
         # A buffer to hold the previous cycles channelized data
         self.last_data = Signal(32)
         # FSM States with initial values
-        self.state = Signal(PacketizerState, reset=PacketizerState.WaitRst)
+        self.state = Signal(PacketizerState, reset=PacketizerState.WaitArm)
         self.fifo_state = Signal(FIFOState, reset=FIFOState.Loading)
 
         # Constants
@@ -59,20 +58,18 @@ class Packetizer(Elaboratable):
     def elaborate(self, _):
         # Instatiate the module
         m = Module()
-        sync = ClockDomain(reset_less=True)
 
         # Setup the FIFO submodule
         # Depth is the number of words we will send
         #  + 1 for the header + 10 for overhead
         fifo = SyncFIFOBuffered(width=64, depth=self.n_words.value + 11)
         m.submodules.fifo = fifo
-        m.domains += sync
 
         # When the clock is enabled
         with m.If(self.ce):
             # State Transitions
-            with m.If(self.rst):
-                with m.If(self.state == PacketizerState.WaitRst):
+            with m.If(self.arm):
+                with m.If(self.state == PacketizerState.WaitArm):
                     m.d.sync += self.state.eq(PacketizerState.WaitSync)
                 with m.Elif(self.state == PacketizerState.Running):
                     m.d.sync += self.state.eq(PacketizerState.WaitSync)
@@ -170,15 +167,15 @@ def bench():
     yield dut.ce.eq(1)
     yield
     # Set initial values
-    yield dut.rst.eq(0)
+    yield dut.arm.eq(0)
     yield dut.sync_in.eq(0)
     # Wait a clock cycle and check state
     yield
-    assert (yield dut.state) == PacketizerState.WaitRst.value
+    assert (yield dut.state) == PacketizerState.WaitArm.value
     # Reset
-    yield dut.rst.eq(1)
+    yield dut.arm.eq(1)
     yield
-    yield dut.rst.eq(0)
+    yield dut.arm.eq(0)
     # Wait a clock cycle and check state
     yield
     assert (yield dut.state) == PacketizerState.WaitSync.value
@@ -207,7 +204,7 @@ with open("packetizer.v", "w") as f:
         verilog.convert(
             dut,
             ports=[
-                dut.rst,
+                dut.arm,
                 dut.ce,
                 dut.sync_in,
                 dut.ch_a_in,

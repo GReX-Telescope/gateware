@@ -205,5 +205,6 @@ with open("packetizer.v", "w") as f:
                 dut.tx_eof,
             ],
             name="packetizer",
+            strip_internal_attrs=True,
         )
     )

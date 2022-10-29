@@ -23,6 +23,12 @@ source casper_venv/bin/activate
 pip3 install -r mlib_devel/requirements.txt
 ```
 
+### External HDL
+
+Simulink gives me cancer, so I wrote some blocks in the excellent [Amaranth HDL](https://github.com/amaranth-lang/amaranth).
+I'm including the "compiled" verilog in this repo, but one can regenerate it by installing amaranth and running the python
+files in the `hdl` folder.
+
 
 ### Compile
 

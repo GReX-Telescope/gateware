@@ -22,7 +22,7 @@ class Packetizer(Elaboratable):
 
     def __init__(self, n_words: int):
         # Input Ports
-        self.rst = Signal()
+        self.master_rst = Signal()
         self.sync_in = Signal()
         # Packed 8+8 bit Fix8_7 complex numbers
         self.ch_a_in = Signal(16)
@@ -65,7 +65,7 @@ class Packetizer(Elaboratable):
         m.submodules.fifo = fifo
 
         # State Transitions
-        with m.If(self.rst):
+        with m.If(self.master_rst):
             with m.If(self.state == PacketizerState.WaitRst):
                 m.d.sync += self.state.eq(PacketizerState.WaitSync)
             with m.Elif(self.state == PacketizerState.Running):
@@ -159,15 +159,15 @@ dut = Packetizer(1024)
 
 def bench():
     # Set initial values
-    yield dut.rst.eq(0)
+    yield dut.master_rst.eq(0)
     yield dut.sync_in.eq(0)
     # Wait a clock cycle and check state
     yield
     assert (yield dut.state) == PacketizerState.WaitRst.value
     # Reset
-    yield dut.rst.eq(1)
+    yield dut.master_rst.eq(1)
     yield
-    yield dut.rst.eq(0)
+    yield dut.master_rst.eq(0)
     # Wait a clock cycle and check state
     yield
     assert (yield dut.state) == PacketizerState.WaitSync.value
@@ -196,7 +196,7 @@ with open("packetizer.v", "w") as f:
         verilog.convert(
             dut,
             ports=[
-                dut.rst,
+                dut.master_rst,
                 dut.sync_in,
                 dut.ch_a_in,
                 dut.ch_b_in,

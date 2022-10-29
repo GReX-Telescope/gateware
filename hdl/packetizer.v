@@ -74,55 +74,55 @@ module fifo(w_en, r_en, r_data, rst, clk, w_data);
   assign unbuffered_w_data = w_data;
 endmodule
 
-module packetizer(sync_in, ch_a_in, ch_b_in, tx_data, tx_valid, tx_eof, clk, \rst$1 , rst);
+module packetizer(sync_in, ch_a_in, ch_b_in, tx_data, tx_valid, tx_eof, clk, rst, master_rst);
   reg \$auto$verilog_backend.cc:2083:dump_module$2  = 0;
-  wire \$10 ;
-  wire \$12 ;
+  wire \$1 ;
+  wire \$11 ;
+  wire [64:0] \$13 ;
   wire [64:0] \$14 ;
-  wire [64:0] \$15 ;
-  wire \$17 ;
-  wire \$19 ;
-  wire \$2 ;
-  wire \$21 ;
-  wire \$23 ;
-  wire \$25 ;
-  wire \$27 ;
-  wire \$29 ;
-  wire \$31 ;
-  wire \$33 ;
+  wire \$16 ;
+  wire \$18 ;
+  wire \$20 ;
+  wire \$22 ;
+  wire \$24 ;
+  wire \$26 ;
+  wire \$28 ;
+  wire \$3 ;
+  wire \$30 ;
+  wire \$32 ;
+  wire [64:0] \$34 ;
   wire [64:0] \$35 ;
-  wire [64:0] \$36 ;
-  wire \$38 ;
-  wire \$4 ;
-  wire \$40 ;
+  wire \$37 ;
+  wire \$39 ;
+  wire [11:0] \$41 ;
   wire [11:0] \$42 ;
-  wire [11:0] \$43 ;
-  wire \$45 ;
-  wire \$47 ;
-  wire \$49 ;
-  wire \$51 ;
-  wire [11:0] \$53 ;
-  wire \$55 ;
-  wire \$57 ;
-  wire \$59 ;
-  wire \$6 ;
-  wire \$61 ;
-  wire \$63 ;
-  wire \$65 ;
-  wire \$67 ;
-  wire \$69 ;
-  wire \$71 ;
-  wire \$73 ;
-  wire \$75 ;
-  wire \$77 ;
-  wire \$79 ;
-  wire \$8 ;
-  wire \$81 ;
+  wire \$44 ;
+  wire \$46 ;
+  wire \$48 ;
+  wire \$5 ;
+  wire \$50 ;
+  wire [11:0] \$52 ;
+  wire \$54 ;
+  wire \$56 ;
+  wire \$58 ;
+  wire \$60 ;
+  wire \$62 ;
+  wire \$64 ;
+  wire \$66 ;
+  wire \$68 ;
+  wire \$7 ;
+  wire \$70 ;
+  wire \$72 ;
+  wire \$74 ;
+  wire \$76 ;
+  wire \$78 ;
+  wire \$80 ;
+  wire [11:0] \$82 ;
   wire [11:0] \$83 ;
-  wire [11:0] \$84 ;
-  wire \$86 ;
-  wire \$88 ;
-  wire \$90 ;
+  wire \$85 ;
+  wire \$87 ;
+  wire \$89 ;
+  wire \$9 ;
   input [15:0] ch_a_in;
   wire [15:0] ch_a_in;
   input [15:0] ch_b_in;
@@ -146,12 +146,12 @@ module packetizer(sync_in, ch_a_in, ch_b_in, tx_data, tx_valid, tx_eof, clk, \rs
   reg [31:0] \last_data$next ;
   reg low_word = 1'h1;
   reg \low_word$next ;
+  input master_rst;
+  wire master_rst;
   reg [63:0] payload_count = 64'h0000000000000000;
   reg [63:0] \payload_count$next ;
   input rst;
   wire rst;
-  input \rst$1 ;
-  wire \rst$1 ;
   (* enum_base_type = "PacketizerState" *)
   (* enum_value_00 = "WaitRst" *)
   (* enum_value_01 = "WaitSync" *)
@@ -171,54 +171,52 @@ module packetizer(sync_in, ch_a_in, ch_b_in, tx_data, tx_valid, tx_eof, clk, \rs
   reg \tx_valid$next ;
   reg [10:0] word_count = 11'h000;
   reg [10:0] \word_count$next ;
-  always @(posedge clk)
-    tx_data <= \tx_data$next ;
+  assign \$9  = state == 2'h2;
   always @(posedge clk)
     fifo_drain_count <= \fifo_drain_count$next ;
   always @(posedge clk)
     tx_eof <= \tx_eof$next ;
-  assign \$10  = state == 2'h2;
-  assign \$12  = word_count == 11'h400;
-  assign \$15  = payload_count + 1'h1;
-  assign \$17  = state == 2'h1;
-  assign \$19  = state == 2'h2;
-  assign \$21  = word_count == 11'h400;
-  assign \$23  = state == 2'h2;
-  assign \$25  = state == 2'h2;
-  assign \$27  = ~ low_word;
-  assign \$2  = ! state;
-  assign \$29  = ~ low_word;
-  assign \$31  = state == 2'h2;
-  assign \$33  = word_count == 11'h400;
-  assign \$36  = payload_count + 1'h1;
-  assign \$38  = state == 2'h2;
-  assign \$40  = word_count == 11'h400;
-  assign \$43  = word_count + 1'h1;
-  assign \$45  = state == 2'h2;
-  assign \$47  = word_count == 11'h400;
-  assign \$4  = state == 2'h2;
-  assign \$49  = fifo_state == 2'h1;
-  assign \$51  = fifo_state == 2'h2;
-  assign \$55  = fifo_drain_count == 12'h3ff;
-  assign \$57  = state == 2'h2;
-  assign \$59  = word_count == 11'h400;
-  assign \$61  = fifo_state == 2'h1;
-  assign \$63  = fifo_state == 2'h2;
-  assign \$65  = state == 2'h2;
-  assign \$67  = fifo_state == 2'h1;
-  assign \$6  = state == 2'h1;
-  assign \$69  = fifo_state == 2'h2;
-  assign \$71  = state == 2'h2;
-  assign \$73  = fifo_state == 2'h1;
-  assign \$75  = fifo_state == 2'h2;
-  assign \$77  = state == 2'h2;
-  assign \$79  = fifo_state == 2'h1;
-  assign \$81  = fifo_state == 2'h2;
-  assign \$84  = fifo_drain_count + 1'h1;
-  assign \$86  = state == 2'h2;
-  assign \$88  = fifo_state == 2'h1;
-  assign \$8  = state == 2'h1;
-  assign \$90  = fifo_state == 2'h2;
+  assign \$11  = word_count == 11'h400;
+  assign \$14  = payload_count + 1'h1;
+  assign \$16  = state == 2'h1;
+  assign \$18  = state == 2'h2;
+  assign \$1  = ! state;
+  assign \$20  = word_count == 11'h400;
+  assign \$22  = state == 2'h2;
+  assign \$24  = state == 2'h2;
+  assign \$26  = ~ low_word;
+  assign \$28  = ~ low_word;
+  assign \$30  = state == 2'h2;
+  assign \$32  = word_count == 11'h400;
+  assign \$35  = payload_count + 1'h1;
+  assign \$37  = state == 2'h2;
+  assign \$3  = state == 2'h2;
+  assign \$39  = word_count == 11'h400;
+  assign \$42  = word_count + 1'h1;
+  assign \$44  = state == 2'h2;
+  assign \$46  = word_count == 11'h400;
+  assign \$48  = fifo_state == 2'h1;
+  assign \$50  = fifo_state == 2'h2;
+  assign \$54  = fifo_drain_count == 12'h3ff;
+  assign \$56  = state == 2'h2;
+  assign \$58  = word_count == 11'h400;
+  assign \$5  = state == 2'h1;
+  assign \$60  = fifo_state == 2'h1;
+  assign \$62  = fifo_state == 2'h2;
+  assign \$64  = state == 2'h2;
+  assign \$66  = fifo_state == 2'h1;
+  assign \$68  = fifo_state == 2'h2;
+  assign \$70  = state == 2'h2;
+  assign \$72  = fifo_state == 2'h1;
+  assign \$74  = fifo_state == 2'h2;
+  assign \$76  = state == 2'h2;
+  assign \$78  = fifo_state == 2'h1;
+  assign \$7  = state == 2'h1;
+  assign \$80  = fifo_state == 2'h2;
+  assign \$83  = fifo_drain_count + 1'h1;
+  assign \$85  = state == 2'h2;
+  assign \$87  = fifo_state == 2'h1;
+  assign \$89  = fifo_state == 2'h2;
   always @(posedge clk)
     state <= \state$next ;
   always @(posedge clk)
@@ -235,20 +233,22 @@ module packetizer(sync_in, ch_a_in, ch_b_in, tx_data, tx_valid, tx_eof, clk, \rs
     fifo_r_en <= \fifo_r_en$next ;
   always @(posedge clk)
     tx_valid <= \tx_valid$next ;
+  always @(posedge clk)
+    tx_data <= \tx_data$next ;
   fifo fifo (
     .clk(clk),
     .r_data(fifo_r_data),
     .r_en(fifo_r_en),
-    .rst(\rst$1 ),
+    .rst(rst),
     .w_data(fifo_w_data),
     .w_en(fifo_w_en)
   );
   always @* begin
     if (\$auto$verilog_backend.cc:2083:dump_module$2 ) begin end
     \state$next  = state;
-    casez (rst)
+    casez (master_rst)
       1'h1:
-          casez ({ \$4 , \$2  })
+          casez ({ \$3 , \$1  })
             2'b?1:
                 \state$next  = 2'h1;
             2'b1?:
@@ -257,12 +257,12 @@ module packetizer(sync_in, ch_a_in, ch_b_in, tx_data, tx_valid, tx_eof, clk, \rs
     endcase
     casez (sync_in)
       1'h1:
-          casez (\$6 )
+          casez (\$5 )
             1'h1:
                 \state$next  = 2'h2;
           endcase
     endcase
-    casez (\rst$1 )
+    casez (rst)
       1'h1:
           \state$next  = 2'h0;
     endcase
@@ -272,19 +272,19 @@ module packetizer(sync_in, ch_a_in, ch_b_in, tx_data, tx_valid, tx_eof, clk, \rs
     fifo_w_data = 64'h0000000000000000;
     casez (sync_in)
       1'h1:
-          casez (\$8 )
+          casez (\$7 )
             1'h1:
                 fifo_w_data = payload_count;
           endcase
     endcase
-    casez (\$10 )
+    casez (\$9 )
       1'h1:
           (* full_case = 32'd1 *)
           casez (low_word)
             1'h1:
-                casez (\$12 )
+                casez (\$11 )
                   1'h1:
-                      fifo_w_data = \$15 [63:0];
+                      fifo_w_data = \$14 [63:0];
                 endcase
             default:
                 fifo_w_data = { last_data, ch_a_in, ch_b_in };
@@ -294,10 +294,10 @@ module packetizer(sync_in, ch_a_in, ch_b_in, tx_data, tx_valid, tx_eof, clk, \rs
   always @* begin
     if (\$auto$verilog_backend.cc:2083:dump_module$2 ) begin end
     (* full_case = 32'd1 *)
-    casez (\$71 )
+    casez (\$70 )
       1'h1:
           (* full_case = 32'd1 *)
-          casez ({ \$75 , \$73  })
+          casez ({ \$74 , \$72  })
             2'b?1:
                 \tx_data$next  = fifo_r_data;
             2'b1?:
@@ -308,7 +308,7 @@ module packetizer(sync_in, ch_a_in, ch_b_in, tx_data, tx_valid, tx_eof, clk, \rs
       default:
           \tx_data$next  = 64'h0000000000000000;
     endcase
-    casez (\rst$1 )
+    casez (rst)
       1'h1:
           \tx_data$next  = 64'h0000000000000000;
     endcase
@@ -316,16 +316,16 @@ module packetizer(sync_in, ch_a_in, ch_b_in, tx_data, tx_valid, tx_eof, clk, \rs
   always @* begin
     if (\$auto$verilog_backend.cc:2083:dump_module$2 ) begin end
     \fifo_drain_count$next  = fifo_drain_count;
-    casez (\$77 )
+    casez (\$76 )
       1'h1:
-          casez ({ \$81 , \$79  })
+          casez ({ \$80 , \$78  })
             2'b?1:
-                \fifo_drain_count$next  = \$84 [10:0];
+                \fifo_drain_count$next  = \$83 [10:0];
             2'b1?:
                 \fifo_drain_count$next  = 11'h000;
           endcase
     endcase
-    casez (\rst$1 )
+    casez (rst)
       1'h1:
           \fifo_drain_count$next  = 11'h000;
     endcase
@@ -334,10 +334,10 @@ module packetizer(sync_in, ch_a_in, ch_b_in, tx_data, tx_valid, tx_eof, clk, \rs
     if (\$auto$verilog_backend.cc:2083:dump_module$2 ) begin end
     \tx_eof$next  = tx_eof;
     (* full_case = 32'd1 *)
-    casez (\$86 )
+    casez (\$85 )
       1'h1:
           (* full_case = 32'd1 *)
-          casez ({ \$90 , \$88  })
+          casez ({ \$89 , \$87  })
             2'b?1:
                 /* empty */;
             2'b1?:
@@ -348,7 +348,7 @@ module packetizer(sync_in, ch_a_in, ch_b_in, tx_data, tx_valid, tx_eof, clk, \rs
       default:
           \tx_eof$next  = 1'h0;
     endcase
-    casez (\rst$1 )
+    casez (rst)
       1'h1:
           \tx_eof$next  = 1'h0;
     endcase
@@ -358,17 +358,17 @@ module packetizer(sync_in, ch_a_in, ch_b_in, tx_data, tx_valid, tx_eof, clk, \rs
     fifo_w_en = 1'h0;
     casez (sync_in)
       1'h1:
-          casez (\$17 )
+          casez (\$16 )
             1'h1:
                 fifo_w_en = 1'h1;
           endcase
     endcase
-    casez (\$19 )
+    casez (\$18 )
       1'h1:
           (* full_case = 32'd1 *)
           casez (low_word)
             1'h1:
-                casez (\$21 )
+                casez (\$20 )
                   1'h1:
                       fifo_w_en = 1'h1;
                 endcase
@@ -380,14 +380,14 @@ module packetizer(sync_in, ch_a_in, ch_b_in, tx_data, tx_valid, tx_eof, clk, \rs
   always @* begin
     if (\$auto$verilog_backend.cc:2083:dump_module$2 ) begin end
     \last_data$next  = last_data;
-    casez (\$23 )
+    casez (\$22 )
       1'h1:
           casez (low_word)
             1'h1:
                 \last_data$next  = { ch_a_in, ch_b_in };
           endcase
     endcase
-    casez (\rst$1 )
+    casez (rst)
       1'h1:
           \last_data$next  = 32'd0;
     endcase
@@ -395,17 +395,17 @@ module packetizer(sync_in, ch_a_in, ch_b_in, tx_data, tx_valid, tx_eof, clk, \rs
   always @* begin
     if (\$auto$verilog_backend.cc:2083:dump_module$2 ) begin end
     \low_word$next  = low_word;
-    casez (\$25 )
+    casez (\$24 )
       1'h1:
           (* full_case = 32'd1 *)
           casez (low_word)
             1'h1:
-                \low_word$next  = \$27 ;
+                \low_word$next  = \$26 ;
             default:
-                \low_word$next  = \$29 ;
+                \low_word$next  = \$28 ;
           endcase
     endcase
-    casez (\rst$1 )
+    casez (rst)
       1'h1:
           \low_word$next  = 1'h1;
     endcase
@@ -413,17 +413,17 @@ module packetizer(sync_in, ch_a_in, ch_b_in, tx_data, tx_valid, tx_eof, clk, \rs
   always @* begin
     if (\$auto$verilog_backend.cc:2083:dump_module$2 ) begin end
     \payload_count$next  = payload_count;
-    casez (\$31 )
+    casez (\$30 )
       1'h1:
           casez (low_word)
             1'h1:
-                casez (\$33 )
+                casez (\$32 )
                   1'h1:
-                      \payload_count$next  = \$36 [63:0];
+                      \payload_count$next  = \$35 [63:0];
                 endcase
           endcase
     endcase
-    casez (\rst$1 )
+    casez (rst)
       1'h1:
           \payload_count$next  = 64'h0000000000000000;
     endcase
@@ -431,20 +431,20 @@ module packetizer(sync_in, ch_a_in, ch_b_in, tx_data, tx_valid, tx_eof, clk, \rs
   always @* begin
     if (\$auto$verilog_backend.cc:2083:dump_module$2 ) begin end
     \word_count$next  = word_count;
-    casez (\$38 )
+    casez (\$37 )
       1'h1:
           (* full_case = 32'd1 *)
           casez (low_word)
             1'h1:
-                casez (\$40 )
+                casez (\$39 )
                   1'h1:
                       \word_count$next  = 11'h000;
                 endcase
             default:
-                \word_count$next  = \$43 [10:0];
+                \word_count$next  = \$42 [10:0];
           endcase
     endcase
-    casez (\rst$1 )
+    casez (rst)
       1'h1:
           \word_count$next  = 11'h000;
     endcase
@@ -452,19 +452,19 @@ module packetizer(sync_in, ch_a_in, ch_b_in, tx_data, tx_valid, tx_eof, clk, \rs
   always @* begin
     if (\$auto$verilog_backend.cc:2083:dump_module$2 ) begin end
     \fifo_state$next  = fifo_state;
-    casez (\$45 )
+    casez (\$44 )
       1'h1:
         begin
           casez (low_word)
             1'h1:
-                casez (\$47 )
+                casez (\$46 )
                   1'h1:
                       \fifo_state$next  = 2'h1;
                 endcase
           endcase
-          casez ({ \$51 , \$49  })
+          casez ({ \$50 , \$48  })
             2'b?1:
-                casez (\$55 )
+                casez (\$54 )
                   1'h1:
                       \fifo_state$next  = 2'h2;
                 endcase
@@ -473,7 +473,7 @@ module packetizer(sync_in, ch_a_in, ch_b_in, tx_data, tx_valid, tx_eof, clk, \rs
           endcase
         end
     endcase
-    casez (\rst$1 )
+    casez (rst)
       1'h1:
           \fifo_state$next  = 2'h0;
     endcase
@@ -481,17 +481,17 @@ module packetizer(sync_in, ch_a_in, ch_b_in, tx_data, tx_valid, tx_eof, clk, \rs
   always @* begin
     if (\$auto$verilog_backend.cc:2083:dump_module$2 ) begin end
     \fifo_r_en$next  = fifo_r_en;
-    casez (\$57 )
+    casez (\$56 )
       1'h1:
         begin
           casez (low_word)
             1'h1:
-                casez (\$59 )
+                casez (\$58 )
                   1'h1:
                       \fifo_r_en$next  = 1'h1;
                 endcase
           endcase
-          casez ({ \$63 , \$61  })
+          casez ({ \$62 , \$60  })
             2'b?1:
                 \fifo_r_en$next  = 1'h1;
             2'b1?:
@@ -499,7 +499,7 @@ module packetizer(sync_in, ch_a_in, ch_b_in, tx_data, tx_valid, tx_eof, clk, \rs
           endcase
         end
     endcase
-    casez (\rst$1 )
+    casez (rst)
       1'h1:
           \fifo_r_en$next  = 1'h0;
     endcase
@@ -507,10 +507,10 @@ module packetizer(sync_in, ch_a_in, ch_b_in, tx_data, tx_valid, tx_eof, clk, \rs
   always @* begin
     if (\$auto$verilog_backend.cc:2083:dump_module$2 ) begin end
     (* full_case = 32'd1 *)
-    casez (\$65 )
+    casez (\$64 )
       1'h1:
           (* full_case = 32'd1 *)
-          casez ({ \$69 , \$67  })
+          casez ({ \$68 , \$66  })
             2'b?1:
                 \tx_valid$next  = 1'h1;
             2'b1?:
@@ -521,16 +521,16 @@ module packetizer(sync_in, ch_a_in, ch_b_in, tx_data, tx_valid, tx_eof, clk, \rs
       default:
           \tx_valid$next  = 1'h0;
     endcase
-    casez (\rst$1 )
+    casez (rst)
       1'h1:
           \tx_valid$next  = 1'h0;
     endcase
   end
-  assign \$14  = \$15 ;
-  assign \$35  = \$36 ;
-  assign \$42  = \$43 ;
-  assign \$83  = \$84 ;
-  assign \$53  = 12'h3ff;
+  assign \$13  = \$14 ;
+  assign \$34  = \$35 ;
+  assign \$41  = \$42 ;
+  assign \$82  = \$83 ;
+  assign \$52  = 12'h3ff;
 endmodule
 
 module unbuffered(clk, w_data, w_en, w_rdy, r_data, r_en, r_rdy, level, rst);

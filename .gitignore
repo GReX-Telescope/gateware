@@ -11,3 +11,4 @@ grex_gateware/
 build
 htmlcov
 casper_venv/
+hdl/*.vcd

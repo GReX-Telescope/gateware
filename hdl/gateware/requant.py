@@ -26,7 +26,7 @@ class Requant(Elaboratable):
         self.out_bits = out_bits
 
         ## Inputs
-        self.input = Signal(2 * in_bits)
+        self.requant_in = Signal(2 * in_bits)
         self.gain = Signal(in_bits - out_bits + 1)
         self.sync_in = Signal()
         # To prepare for incoming data
@@ -35,7 +35,7 @@ class Requant(Elaboratable):
         self.ce = Signal()
 
         ## Outputs
-        self.output = Signal(2 * out_bits)
+        self.requant_out = Signal(2 * out_bits)
         self.sync_out = Signal()
         # Booleans to indicate that some multiplication overflowed
         self.overflow = Signal()
@@ -55,13 +55,13 @@ class Requant(Elaboratable):
     def ports(self):
         return [
             # Inputs
-            self.input,
+            self.requant_in,
             self.sync_in,
             self.gain,
             self.arm,
             self.ce,
             # Outputs
-            self.output,
+            self.requant_out,
             self.sync_out,
             self.overflow,
             self.addr,
@@ -108,7 +108,7 @@ class Requant(Elaboratable):
 
                 # Perfom the multiplication
                 m.d.comb += [
-                    cm.input.eq(self.input),
+                    cm.cm_in.eq(self.requant_in),
                     cm.gain.eq(self.gain),
                     self.inter_re.eq(cm.re),
                     self.inter_im.eq(cm.im),
@@ -120,7 +120,7 @@ class Requant(Elaboratable):
                 )
 
                 # And assign these on the next clock
-                m.d.sync += self.output.eq(out)
+                m.d.sync += self.requant_out.eq(out)
 
                 # Check the overflow bits, and OR them together
                 m.d.sync += self.overflow.eq(cm.im_overflow | cm.re_overflow)

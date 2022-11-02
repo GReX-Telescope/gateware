@@ -11,4 +11,6 @@ grex_gateware/
 build
 htmlcov
 casper_venv/
-hdl/*.vcd
+hdl/.venv
+hdl/.pytest_cache
+*__pycache__

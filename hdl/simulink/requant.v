@@ -1,7 +1,7 @@
 // Created by Verilog::EditFiles from requant.v
 
 `celldefine
-module requant(sync_in, gain, arm, ce, \output , sync_out, overflow, addr, clk, rst, \input );
+module requant(sync_in, gain, arm, ce, requant_out, sync_out, overflow, addr, clk, rst, requant_in);
   reg \$auto$verilog_backend.cc:2083:dump_module$2  = 0;
   wire \$1 ;
   wire \$11 ;
@@ -31,24 +31,24 @@ module requant(sync_in, gain, arm, ce, \output , sync_out, overflow, addr, clk, 
   reg [10:0] \chan_count$next ;
   input clk;
   wire clk;
+  reg [23:0] cm_cm_in;
   reg [4:0] cm_gain;
   wire [11:0] cm_im;
   wire cm_im_overflow;
-  reg [23:0] cm_input;
   wire [11:0] cm_re;
   wire cm_re_overflow;
   input [4:0] gain;
   wire [4:0] gain;
-  input [23:0] \input ;
-  wire [23:0] \input ;
   reg [11:0] inter_im;
   reg [11:0] inter_re;
-  output [15:0] \output ;
-  reg [15:0] \output  = 16'h0000;
-  reg [15:0] \output$next ;
   output overflow;
   reg overflow = 1'h0;
   reg \overflow$next ;
+  input [23:0] requant_in;
+  wire [23:0] requant_in;
+  output [15:0] requant_out;
+  reg [15:0] requant_out = 16'h0000;
+  reg [15:0] \requant_out$next ;
   input rst;
   wire rst;
   (* enum_base_type = "RequantState" *)
@@ -82,17 +82,17 @@ module requant(sync_in, gain, arm, ce, \output , sync_out, overflow, addr, clk, 
   always @(posedge clk)
     chan_count <= \chan_count$next ;
   always @(posedge clk)
-    \output  <= \output$next ;
+    requant_out <= \requant_out$next ;
   assign \$3  = state == 2'h2;
   always @(posedge clk)
     overflow <= \overflow$next ;
   assign \$5  = state == 2'h1;
   assign \$7  = state == 2'h1;
   cm cm (
+    .cm_in(cm_cm_in),
     .gain(cm_gain),
     .im(cm_im),
     .im_overflow(cm_im_overflow),
-    .\input (cm_input),
     .re(cm_re),
     .re_overflow(cm_re_overflow)
   );
@@ -183,12 +183,12 @@ module requant(sync_in, gain, arm, ce, \output , sync_out, overflow, addr, clk, 
   end
   always @* begin
     if (\$auto$verilog_backend.cc:2083:dump_module$2 ) begin end
-    cm_input = 24'h000000;
+    cm_cm_in = 24'h000000;
     casez (ce)
       1'h1:
           casez (\$22 )
             1'h1:
-                cm_input = \input ;
+                cm_cm_in = requant_in;
           endcase
     endcase
   end
@@ -227,17 +227,17 @@ module requant(sync_in, gain, arm, ce, \output , sync_out, overflow, addr, clk, 
   end
   always @* begin
     if (\$auto$verilog_backend.cc:2083:dump_module$2 ) begin end
-    \output$next  = \output ;
+    \requant_out$next  = requant_out;
     casez (ce)
       1'h1:
           casez (\$30 )
             1'h1:
-                \output$next  = { inter_re[11:4], inter_im[11:4] };
+                \requant_out$next  = { inter_re[11:4], inter_im[11:4] };
           endcase
     endcase
     casez (rst)
       1'h1:
-          \output$next  = 16'h0000;
+          \requant_out$next  = 16'h0000;
     endcase
   end
   always @* begin

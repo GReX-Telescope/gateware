@@ -22,7 +22,7 @@ def test_requant():
         assert (yield dut.state) == RequantState.WaitSync.value
         # Try to move the LSB of the input to the output
         yield dut.gain.eq(16)
-        yield dut.input.eq(0b00000001_00000001)
+        yield dut.requant_in.eq(0b00000001_00000001)
         yield
         assert (yield dut.state) == RequantState.Running.value
         # At this point, the addr selector should be on zero
@@ -30,21 +30,21 @@ def test_requant():
         # And sync_out should be high as the next clock will contain the valid data
         assert (yield dut.sync_out)
         # Now we'll set a new gain, input, and output for the next cycle
-        yield dut.input.eq(0b11111110_11111110)
+        yield dut.requant_in.eq(0b11111110_11111110)
         yield dut.gain.eq(1)
         yield
         # On this cyle, we should have 1,1
-        assert (yield dut.output) == 0b0001_0001
+        assert (yield dut.requant_out) == 0b0001_0001
         # And be selecting the the second address
         assert (yield dut.addr) == 1
         # And now set the gain too high to show clamping
         yield dut.gain.eq(3)
-        yield dut.input.eq(0b01000000_10000000)
+        yield dut.requant_in.eq(0b01000000_10000000)
         yield
-        assert (yield dut.output) == 0b1111_1111
+        assert (yield dut.requant_out) == 0b1111_1111
         yield
         assert (yield dut.overflow)
-        assert (yield dut.output) == 0b0111_1000
+        assert (yield dut.requant_out) == 0b0111_1000
 
 
     # Tell the simulation about the process and the waveform context to run

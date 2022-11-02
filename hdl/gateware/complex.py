@@ -6,20 +6,20 @@ class UnpackComplex(Elaboratable):
     """Combinational circuit to unpack a complex number."""
 
     def __init__(self, bits: int):
-        self.input = Signal(2 * bits)
+        self.unpack_in = Signal(2 * bits)
         self.re = Signal(signed(bits))
         self.im = Signal(signed(bits))
         self.bits = bits
 
     def ports(self) -> List[Signal]:
-        return [self.input, self.re, self.im]
+        return [self.unpack_in, self.re, self.im]
 
     def elaborate(self, _):
         m = Module()
         # least significant bits are imaginary
         m.d.comb += [
-            self.im.eq(self.input[: self.bits]),
-            self.re.eq(self.input[self.bits :]),
+            self.im.eq(self.unpack_in[: self.bits]),
+            self.re.eq(self.unpack_in[self.bits :]),
         ]
         return m
 
@@ -37,7 +37,7 @@ class ComplexMult(Elaboratable):
         self.in_bits = in_bits
         self.inter_bits = gain_bits + in_bits
         # Inputs
-        self.input = Signal(2 * in_bits)
+        self.cm_in = Signal(2 * in_bits)
         self.gain = Signal(gain_bits)
         # Outputs
         self.re = Signal(signed(in_bits))
@@ -49,7 +49,7 @@ class ComplexMult(Elaboratable):
         self.im_gain = Signal(signed(self.inter_bits))
 
     def ports(self) -> List[Signal]:
-        return [self.input, self.gain, self.re, self.im]
+        return [self.cm_in, self.gain, self.re, self.im]
 
     def elaborate(self, _):
         # Instatiate the module and submodules
@@ -59,7 +59,7 @@ class ComplexMult(Elaboratable):
         m.submodules.unpack = unpack
 
         # Unpack
-        m.d.comb += unpack.input.eq(self.input)
+        m.d.comb += unpack.unpack_in.eq(self.cm_in)
 
         # Multiply, ensuring we do sign extension
         m.d.comb += [

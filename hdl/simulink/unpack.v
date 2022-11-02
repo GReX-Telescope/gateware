@@ -1,15 +1,15 @@
 // Created by Verilog::EditFiles from requant.v
 
 `celldefine
-module unpack(im, re, \input );
+module unpack(im, re, unpack_in);
   output [11:0] im;
   wire [11:0] im;
-  input [23:0] \input ;
-  wire [23:0] \input ;
   output [11:0] re;
   wire [11:0] re;
-  assign re = \input [23:12];
-  assign im = \input [11:0];
+  input [23:0] unpack_in;
+  wire [23:0] unpack_in;
+  assign re = unpack_in[23:12];
+  assign im = unpack_in[11:0];
 endmodule
 `endcelldefine
 

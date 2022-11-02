@@ -13,7 +13,7 @@ def complex_input(dut: ComplexMult, real: int, imag: int):
     assert min <= imag <= max
     # Pack (imag lsb)
     word = BitStream(f"int:{bits}={real}, int:{bits}={imag}")
-    yield dut.input.eq(word.int)
+    yield dut.cm_in.eq(word.int)
 
 
 def test_complex():

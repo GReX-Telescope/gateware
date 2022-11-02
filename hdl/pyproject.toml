@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "grex-gateware"
+version = "0.1.0"
+description = "SNAP FPGA Gateware for the GReX Telescope"
+authors = ["Kiran Shila <me@kiranshila.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "gateware"}]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+amaranth = {git = "https://github.com/amaranth-lang/amaranth.git", branch="main"}
+
+[tool.poetry.group.dev.dependencies]
+black = "^22.10.0"
+
+[tool.poetry.group.test.dependencies]
+bitstring = "^3.1.9"
+pytest = "^7.2.0"
+
+[tool.poetry.scripts]
+build = "gateware.build:build"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

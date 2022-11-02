@@ -1,0 +1,13 @@
+[dumpfile] "/home/kiran/Dropbox/Projects/FPGA/grex/artifacts/requant.vcd"
+[dumpfile_size] 2072
+[treeopen] top.
+@22
+bench.top.input$1[15:0]
+bench.top.sync_in
+bench.top.gain$1[4:0]
+bench.top.arm
+bench.top.ce
+bench.top.output[7:0]
+bench.top.sync_out
+bench.top.overflow
+bench.top.addr[1:0]

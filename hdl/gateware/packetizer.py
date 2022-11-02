@@ -56,6 +56,19 @@ class Packetizer(Elaboratable):
         # Constants
         self.n_words = Const(n_words)
 
+    def ports(self):
+        return [
+            # Inputs
+            self.ce,
+            self.sync_in,
+            self.ch_a_in,
+            self.ch_b_in,
+            # Outputs
+            self.tx_data,
+            self.tx_valid,
+            self.tx_eof,
+        ]
+
     def elaborate(self, _):
         # Instatiate the module
         m = Module()
@@ -152,62 +165,3 @@ class Packetizer(Elaboratable):
 
         # Return the module to elaborate
         return m
-
-
-# Run simulations
-
-dut = Packetizer(1024)
-
-
-def bench():
-    # Set initial values
-    yield dut.arm.eq(0)
-    yield dut.sync_in.eq(0)
-    # Wait a clock cycle and check state
-    yield
-    assert (yield dut.state) == PacketizerState.WaitArm.value
-    # Reset
-    yield dut.arm.eq(1)
-    yield
-    yield dut.arm.eq(0)
-    # Wait a clock cycle and check state
-    yield
-    assert (yield dut.state) == PacketizerState.WaitSync.value
-    # Sync
-    yield dut.sync_in.eq(1)
-    yield
-    # This cycle contains the first valid data
-    yield dut.sync_in.eq(0)
-    # Write a bunch of words
-    for i in range(0, 16384, 2):
-        yield dut.ch_a_in.eq(i)
-        yield dut.ch_b_in.eq(i + 1)
-        yield
-
-
-sim = Simulator(dut)
-sim.add_clock(4e-9)  # 250 MHz
-sim.add_sync_process(bench)
-with sim.write_vcd("packetizer.vcd"):
-    sim.run()
-
-# Export verilog
-
-with open("packetizer.v", "w") as f:
-    f.write(
-        verilog.convert(
-            dut,
-            ports=[
-                dut.arm,
-                dut.ce,
-                dut.sync_in,
-                dut.ch_a_in,
-                dut.ch_b_in,
-                dut.tx_data,
-                dut.tx_valid,
-                dut.tx_eof,
-            ],
-            name="packetizer",
-            strip_internal_attrs=True,
-        )
-    )

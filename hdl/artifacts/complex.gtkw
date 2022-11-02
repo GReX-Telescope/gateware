@@ -1,0 +1,8 @@
+[dumpfile] "/home/kiran/Dropbox/Projects/FPGA/grex/artifacts/complex.vcd"
+[dumpfile_size] 1164
+[treeopen] top.
+@22
+bench.top.input$1[7:0]
+bench.top.gain[1:0]
+bench.top.re$1[3:0]
+bench.top.im$1[3:0]

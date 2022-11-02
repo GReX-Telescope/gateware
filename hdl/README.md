@@ -1,0 +1,1 @@
+In addition to the python requirements, you need the Perl package (I'm sorry), [Verilog::EditFiles](https://metacpan.org/pod/Verilog::EditFiles).

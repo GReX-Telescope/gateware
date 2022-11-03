@@ -20,6 +20,7 @@ pytest = "^7.2.0"
 
 [tool.poetry.scripts]
 build = "gateware.build:build"
+verify = "gateware.build:verify"
 
 [build-system]
 requires = ["poetry-core"]

@@ -1,8 +1,0 @@
-[dumpfile] "/home/kiran/Dropbox/Projects/Python/gateware/hdl/artifacts/complex.vcd"
-[dumpfile_size] 1170
-[treeopen] top.
-@22
-bench.top.cm_in[7:0]
-bench.top.gain[1:0]
-bench.top.re$1[3:0]
-bench.top.im$1[3:0]

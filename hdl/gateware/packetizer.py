@@ -53,6 +53,9 @@ class Packetizer(Elaboratable):
         self.state = Signal(PacketizerState, reset=PacketizerState.WaitArm)
         self.fifo_state = Signal(FIFOState, reset=FIFOState.Loading)
 
+        # Observables
+        self.buffer_ovfl = Signal()
+
         # Constants
         self.n_words = Const(n_words)
 
@@ -76,8 +79,11 @@ class Packetizer(Elaboratable):
         # Setup the FIFO submodule
         # Depth is the number of words we will send
         #  + 1 for the header + 10 for overhead
-        fifo = SyncFIFOBuffered(width=64, depth=self.n_words.value + 11)
+        fifo = SyncFIFOBuffered(width=64, depth=self.n_words.value)
         m.submodules.fifo = fifo
+
+        # Connect the FIFO observables
+        m.d.comb += self.buffer_ovfl.eq(~fifo.w_rdy)
 
         # State Transitions
         with m.If(self.arm):

@@ -13,4 +13,5 @@ htmlcov
 casper_venv/
 hdl/.venv
 hdl/.pytest_cache
+hdl/artifacts/*
 *__pycache__

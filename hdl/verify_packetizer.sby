@@ -1,0 +1,17 @@
+[tasks]
+cover
+prove
+
+[options]
+prove: mode prove
+cover: mode cover
+
+[engines]
+smtbmc boolector
+
+[script]
+read_ilang packetizer.il
+prep -top top
+
+[files]
+./artifacts/packetizer.il

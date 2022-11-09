@@ -5,7 +5,7 @@ from gateware.packetizer import Packetizer, PacketizerState
 from gateware.requant import Requant
 from amaranth.back import verilog, rtlil
 from amaranth import Module
-from amaranth.asserts import Assert, Assume, Cover
+from amaranth.asserts import Assert, Assume, Cover, Past
 
 CHANNELS = 2048
 # As there are two channels per outgoing word, and 2048 channels, we output 1024 words
@@ -19,6 +19,7 @@ OUT_BITS = 8
 PACKETIZER = Packetizer(N_WORDS)
 REQUANT = Requant(IN_BITS, OUT_BITS, CHANNELS)
 
+
 def verify():
     """Generate the output needed for formal verifaction"""
 
@@ -26,19 +27,16 @@ def verify():
     m = Module()
     m.submodules.adder = pktzr = PACKETIZER
 
-    # Verify we can get to all the states we want to get to
-    m.d.comb += Cover(pktzr.state == PacketizerState.WaitArm)
-    m.d.comb += Cover(pktzr.state == PacketizerState.WaitSync)
-    m.d.comb += Cover(pktzr.state == PacketizerState.Running)
+    m.d.comb += [
+        Assume(pktzr.state == PacketizerState.Running),
+        Assume(pktzr.sync_in == 0),
+        Assume(pktzr.arm == 0),
+    ]
 
-    # Now verify behavior
-    # Under the assumption that we are in the running state
-    with m.If(pktzr.state == PacketizerState.Running):
-        # The FIFO shall never overflow
-        m.d.comb += Assert(~pktzr.buffer_ovfl)
+    m.d.comb += Assert(pktzr.buffer_ovfl != 0)
 
     # And write the il file to give to sby
-    with open("artifacts/packetizer.il","w") as f:
+    with open("artifacts/packetizer.il", "w") as f:
         f.write(rtlil.convert(m))
 
 

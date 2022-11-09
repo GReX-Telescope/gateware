@@ -2,42 +2,55 @@ from gateware.packetizer import Packetizer, PacketizerState
 from amaranth.sim import Simulator
 
 
-def test_requant():
-    # Create DUT
-    dut = Packetizer(4)
-
-    # Setup the simulation
+def test_packetizer():
+    n_words = 1024
+    dut = Packetizer(n_words)
     sim = Simulator(dut)
 
     def process():
-        # Set initial values
         yield dut.arm.eq(0)
         yield dut.sync_in.eq(0)
-        # Wait a clock cycle and check state
+        yield dut.ce.eq(0)
         yield
+        # Check the state
         assert (yield dut.state) == PacketizerState.WaitArm.value
-        # Reset
+        # Enable the clock and toggle arm
+        yield dut.ce.eq(1)
         yield dut.arm.eq(1)
         yield
         yield dut.arm.eq(0)
-        # Wait a clock cycle and check state
         yield
+        # Check the state
         assert (yield dut.state) == PacketizerState.WaitSync.value
-        # Sync
+        # Toggle the sync_in
         yield dut.sync_in.eq(1)
         yield
-        # This cycle contains the first valid data
         yield dut.sync_in.eq(0)
-        # Write a bunch of words
-        for i in range(0, 512, 2):
-            yield dut.ch_a_in.eq(i)
-            yield dut.ch_b_in.eq(i + 1)
+        # Write some words
+        for i in range(0, 8 * n_words, 4):
+            # Set our test values
+            yield dut.ch_a.eq(i)
+            yield dut.ch_b.eq(i + 1)
+            yield
+            yield dut.ch_a.eq(i + 2)
+            yield dut.ch_b.eq(i + 3)
+            yield
+        yield  # One cycle to latch the last word
+        yield  # One cycle to enter the drain state
+        yield  # One cycle for it to propogate to the output
+        # Then check the output
+        # First is the header (1, we skipped testing the first one)
+        assert (yield dut.tx_valid)
+        assert (yield dut.tx_data) == 1
+        yield
+        for i in range(4 * n_words, 8 * n_words, 4):
+            # Test our last values
+            value = (i + 2) << 48 | (i + 3) << 32 | (i) << 16 | (i + 1)
+            assert (yield dut.tx_data) == value
+            assert (yield dut.tx_valid)
             yield
 
-    # Tell the simulation about the process and the waveform context to run
     sim.add_sync_process(process)
     sim.add_clock(1e-6)
-    with sim.write_vcd(
-        "artifacts/packetizer.vcd", "artifacts/packetizer.gtkw", traces=dut.ports()
-    ):
+    with sim.write_vcd( "artifacts/packetizer.vcd", "artifacts/packetizer.gtkw", traces=dut.ports()):
         sim.run()

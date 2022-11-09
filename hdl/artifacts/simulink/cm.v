@@ -4,7 +4,7 @@
 
 module cm(gain, re, im, im_overflow, re_overflow, cm_in);
   reg \$auto$verilog_backend.cc:2083:dump_module$1  = 0;
-  wire [11:0] \$1 ;
+  wire [24:0] \$1 ;
   wire \$11 ;
   wire \$13 ;
   wire \$15 ;
@@ -12,36 +12,36 @@ module cm(gain, re, im, im_overflow, re_overflow, cm_in);
   wire \$19 ;
   wire \$21 ;
   wire \$23 ;
-  wire [16:0] \$3 ;
-  wire [11:0] \$5 ;
-  wire [16:0] \$7 ;
+  wire [42:0] \$3 ;
+  wire [24:0] \$5 ;
+  wire [42:0] \$7 ;
   wire \$9 ;
-  input [23:0] cm_in;
-  wire [23:0] cm_in;
-  input [4:0] gain;
-  wire [4:0] gain;
-  output [11:0] im;
-  reg [11:0] im;
-  wire [16:0] im_gain;
+  input [49:0] cm_in;
+  wire [49:0] cm_in;
+  input [17:0] gain;
+  wire [17:0] gain;
+  output [24:0] im;
+  reg [24:0] im;
+  wire [42:0] im_gain;
   output im_overflow;
   reg im_overflow;
-  output [11:0] re;
-  reg [11:0] re;
-  wire [16:0] re_gain;
+  output [24:0] re;
+  reg [24:0] re;
+  wire [42:0] re_gain;
   output re_overflow;
   reg re_overflow;
-  wire [11:0] unpack_im;
-  wire [11:0] unpack_re;
-  wire [23:0] unpack_unpack_in;
-  assign \$9  = $signed(im_gain) > $signed(17'h007ff);
-  assign \$11  = $signed(im_gain) < $signed(17'h1f800);
-  assign \$13  = $signed(im_gain) > $signed(17'h007ff);
-  assign \$15  = $signed(im_gain) < $signed(17'h1f800);
-  assign \$17  = $signed(re_gain) > $signed(17'h007ff);
+  wire [24:0] unpack_im;
+  wire [24:0] unpack_re;
+  wire [49:0] unpack_unpack_in;
+  assign \$9  = $signed(im_gain) > $signed(43'h00000ffffff);
+  assign \$11  = $signed(im_gain) < $signed(43'h7ffff000000);
+  assign \$13  = $signed(im_gain) > $signed(43'h00000ffffff);
+  assign \$15  = $signed(im_gain) < $signed(43'h7ffff000000);
+  assign \$17  = $signed(re_gain) > $signed(43'h00000ffffff);
   assign \$1  = + gain;
-  assign \$19  = $signed(re_gain) < $signed(17'h1f800);
-  assign \$21  = $signed(re_gain) > $signed(17'h007ff);
-  assign \$23  = $signed(re_gain) < $signed(17'h1f800);
+  assign \$19  = $signed(re_gain) < $signed(43'h7ffff000000);
+  assign \$21  = $signed(re_gain) > $signed(43'h00000ffffff);
+  assign \$23  = $signed(re_gain) < $signed(43'h7ffff000000);
   assign \$3  = $signed(unpack_im) * $signed(\$1 );
   assign \$5  = + gain;
   assign \$7  = $signed(unpack_re) * $signed(\$5 );
@@ -67,11 +67,11 @@ module cm(gain, re, im, im_overflow, re_overflow, cm_in);
     (* full_case = 32'd1 *)
     casez ({ \$15 , \$13  })
       2'b?1:
-          im = 12'h7ff;
+          im = 25'h0ffffff;
       2'b1?:
-          im = 12'h800;
+          im = 25'h1000000;
       default:
-          im = im_gain[11:0];
+          im = im_gain[24:0];
     endcase
   end
   always @* begin
@@ -91,11 +91,11 @@ module cm(gain, re, im, im_overflow, re_overflow, cm_in);
     (* full_case = 32'd1 *)
     casez ({ \$23 , \$21  })
       2'b?1:
-          re = 12'h7ff;
+          re = 25'h0ffffff;
       2'b1?:
-          re = 12'h800;
+          re = 25'h1000000;
       default:
-          re = re_gain[11:0];
+          re = re_gain[24:0];
     endcase
   end
   assign re_gain = \$7 ;

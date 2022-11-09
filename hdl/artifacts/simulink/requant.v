@@ -30,21 +30,21 @@ module requant(sync_in, gain, arm, ce, requant_out, sync_out, overflow, addr, cl
   reg [10:0] \chan_count$next ;
   input clk;
   wire clk;
-  reg [23:0] cm_cm_in;
-  reg [4:0] cm_gain;
-  wire [11:0] cm_im;
+  reg [49:0] cm_cm_in;
+  reg [17:0] cm_gain;
+  wire [24:0] cm_im;
   wire cm_im_overflow;
-  wire [11:0] cm_re;
+  wire [24:0] cm_re;
   wire cm_re_overflow;
-  input [4:0] gain;
-  wire [4:0] gain;
-  reg [11:0] inter_im;
-  reg [11:0] inter_re;
+  input [17:0] gain;
+  wire [17:0] gain;
+  reg [24:0] inter_im;
+  reg [24:0] inter_re;
   output overflow;
   reg overflow = 1'h0;
   reg \overflow$next ;
-  input [23:0] requant_in;
-  wire [23:0] requant_in;
+  input [49:0] requant_in;
+  wire [49:0] requant_in;
   output [15:0] requant_out;
   reg [15:0] requant_out = 16'h0000;
   reg [15:0] \requant_out$next ;
@@ -182,7 +182,7 @@ module requant(sync_in, gain, arm, ce, requant_out, sync_out, overflow, addr, cl
   end
   always @* begin
     if (\$auto$verilog_backend.cc:2083:dump_module$2 ) begin end
-    cm_cm_in = 24'h000000;
+    cm_cm_in = 50'h0000000000000;
     casez (ce)
       1'h1:
           casez (\$22 )
@@ -193,7 +193,7 @@ module requant(sync_in, gain, arm, ce, requant_out, sync_out, overflow, addr, cl
   end
   always @* begin
     if (\$auto$verilog_backend.cc:2083:dump_module$2 ) begin end
-    cm_gain = 5'h00;
+    cm_gain = 18'h00000;
     casez (ce)
       1'h1:
           casez (\$24 )
@@ -204,7 +204,7 @@ module requant(sync_in, gain, arm, ce, requant_out, sync_out, overflow, addr, cl
   end
   always @* begin
     if (\$auto$verilog_backend.cc:2083:dump_module$2 ) begin end
-    inter_re = 12'h000;
+    inter_re = 25'h0000000;
     casez (ce)
       1'h1:
           casez (\$26 )
@@ -215,7 +215,7 @@ module requant(sync_in, gain, arm, ce, requant_out, sync_out, overflow, addr, cl
   end
   always @* begin
     if (\$auto$verilog_backend.cc:2083:dump_module$2 ) begin end
-    inter_im = 12'h000;
+    inter_im = 25'h0000000;
     casez (ce)
       1'h1:
           casez (\$28 )
@@ -231,7 +231,7 @@ module requant(sync_in, gain, arm, ce, requant_out, sync_out, overflow, addr, cl
       1'h1:
           casez (\$30 )
             1'h1:
-                \requant_out$next  = { inter_re[11:4], inter_im[11:4] };
+                \requant_out$next  = { inter_re[24:17], inter_im[24:17] };
           endcase
     endcase
     casez (rst)

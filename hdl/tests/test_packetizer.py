@@ -29,11 +29,11 @@ def test_packetizer():
         # Write some words
         for i in range(0, 8 * n_words, 4):
             # Set our test values
-            yield dut.ch_a.eq(i)
-            yield dut.ch_b.eq(i + 1)
+            yield dut.pol_a.eq(i)
+            yield dut.pol_b.eq(i + 1)
             yield
-            yield dut.ch_a.eq(i + 2)
-            yield dut.ch_b.eq(i + 3)
+            yield dut.pol_a.eq(i + 2)
+            yield dut.pol_b.eq(i + 3)
             yield
         yield  # One cycle to latch the last word
         yield  # One cycle to enter the drain state

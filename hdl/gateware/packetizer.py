@@ -38,8 +38,8 @@ class Packetizer(Elaboratable):
         self.ce = Signal()
         self.arm = Signal()
         self.sync_in = Signal()
-        self.ch_a = Signal(INPUT_SIZE)
-        self.ch_b = Signal(INPUT_SIZE)
+        self.pol_a = Signal(INPUT_SIZE)
+        self.pol_b = Signal(INPUT_SIZE)
 
         ### Observable Internal State
         self.state = Signal(PacketizerState, reset=PacketizerState.WaitArm)
@@ -58,8 +58,8 @@ class Packetizer(Elaboratable):
 
     def ports(self) -> List[Signal]:
         return [
-            self.ch_a,
-            self.ch_b,
+            self.pol_a,
+            self.pol_b,
             self.sync_in,
             self.arm,
             self.ce,
@@ -87,7 +87,7 @@ class Packetizer(Elaboratable):
             # Perform actual functionality when we're running
             with m.If(self.state == PacketizerState.Running):
                 # Every cycle needs the concated inputs
-                packed_inputs = Cat(self.ch_b, self.ch_a)
+                packed_inputs = Cat(self.pol_b, self.pol_a)
                 # On LSB word, save the concat result for the next cycle
                 with m.If(~self.high_bit):
                     m.d.sync += self.last_inputs.eq(packed_inputs)

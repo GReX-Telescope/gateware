@@ -11,7 +11,7 @@ CHANNELS = 2048
 # As there are two channels per outgoing word, and 2048 channels, we output 1024 words
 N_WORDS = CHANNELS // 2
 # The output of the FFT is 25+25 bit
-IN_BITS = 25
+IN_BITS = 18
 # We need to create 8 bit words
 OUT_BITS = 8
 

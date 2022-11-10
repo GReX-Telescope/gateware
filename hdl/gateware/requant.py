@@ -1,17 +1,12 @@
-from enum import Enum
-from math import log2, ceil
 from amaranth import Signal, Module, Elaboratable, Cat, Const, signed
 from gateware.complex import ComplexMult
+from amaranth.lib.fifo import SyncFIFOBuffered
 
-
-class RequantState(Enum):
-    WaitArm = 0
-    WaitSync = 1
-    Running = 2
+TOTAL_DELAY = 5  # Figured out from context
 
 
 class Requant(Elaboratable):
-    """A saturating requant stage"""
+    """A pipelined, saturating requantization stage. 5 Cycle Latency"""
 
     def __init__(self, in_bits: int, out_bits: int, channels: int):
         """
@@ -20,50 +15,55 @@ class Requant(Elaboratable):
         in order to move the LSB of the input to the LSB of the output
         """
 
-        # First, we figure out how many bits to use to hold state about channels
-        n_bits = ceil(log2(channels))
         self.in_bits = in_bits
         self.out_bits = out_bits
 
         ## Inputs
-        self.requant_in = Signal(2 * in_bits)
+        self.pol_a_in = Signal(2 * in_bits)
+        self.pol_b_in = Signal(2 * in_bits)
         self.gain = Signal(in_bits - out_bits + 1)
+        # This sync pulse will reset the counter
         self.sync_in = Signal()
-        # To prepare for incoming data
-        self.arm = Signal()
-        # To make MATLAB happy
         self.ce = Signal()
 
         ## Outputs
-        self.requant_out = Signal(2 * out_bits)
+        self.pol_a_out = Signal(2 * out_bits)
+        self.pol_b_out = Signal(2 * out_bits)
         self.sync_out = Signal()
         # Booleans to indicate that some multiplication overflowed
-        self.overflow = Signal()
+        self.pol_a_overflow = Signal()
+        self.pol_b_overflow = Signal()
         # To address external memory to get the gain for this channel
-        self.addr = Signal(n_bits)
+        self.addr = Signal(range(channels))
 
         ## Intermediate Signals
-        self.inter_re = Signal(signed(in_bits))
-        self.inter_im = Signal(signed(in_bits))
+        self.inter_re_a = Signal(signed(in_bits))
+        self.inter_im_a = Signal(signed(in_bits))
+        self.inter_ovfl_a = Signal()
+
+        self.inter_re_b = Signal(signed(in_bits))
+        self.inter_im_b = Signal(signed(in_bits))
+        self.inter_ovfl_b = Signal()
+
+        self.sync_buf = Signal(TOTAL_DELAY - 1)
 
         ## State
         self.channels = Const(channels)
-        # Counter
-        self.chan_count = Signal(n_bits)
-        self.state = Signal(RequantState, reset=RequantState.WaitArm)
 
     def ports(self):
         return [
             # Inputs
-            self.requant_in,
+            self.pol_a_in,
+            self.pol_b_in,
             self.sync_in,
             self.gain,
-            self.arm,
             self.ce,
             # Outputs
-            self.requant_out,
+            self.pol_a_out,
+            self.pol_b_out,
             self.sync_out,
-            self.overflow,
+            self.pol_a_overflow,
+            self.pol_b_overflow,
             self.addr,
         ]
 
@@ -72,58 +72,57 @@ class Requant(Elaboratable):
         m = Module()
 
         # Add out complex mults as submodules
-        m.submodules.cm = cm = ComplexMult(
+        m.submodules.cm_a = cm_a = cm_b = ComplexMult(
+            self.in_bits, self.in_bits - self.out_bits + 1
+        )
+        m.submodules.cm_b = cm_b = ComplexMult(
             self.in_bits, self.in_bits - self.out_bits + 1
         )
 
         with m.If(self.ce):
-
-            # State Transitions
-            with m.If(self.arm):
-                with m.If(self.state == RequantState.WaitArm):
-                    m.d.sync += self.state.eq(RequantState.WaitSync)
-                with m.Elif(self.state == RequantState.Running):
-                    m.d.sync += self.state.eq(RequantState.WaitSync)
+            # The sync pulse resets the address counter
             with m.If(self.sync_in):
-                with m.If(self.state == RequantState.WaitSync):
-                    m.d.sync += self.state.eq(RequantState.Running)
-                    # And send the ouput sync
-                    m.d.sync += self.sync_out.eq(1)
+                m.d.sync += self.addr.eq(0)
+            with m.Else():
+                # Increment
+                m.d.sync += self.addr.eq((self.addr + 1) % self.channels)
 
-            # Don't do anything until we're running
-            with m.If(self.state == RequantState.Running):
-                # We sent the sync pulse on the state transition, so, we'll always
-                # set sync_out to 0 when we're running
-                m.d.sync += self.sync_out.eq(0)
+            # Setup the multiplications, all buffered
+            m.d.sync += [
+                cm_a.complex_in.eq(self.pol_a_in),
+                cm_a.gain.eq(self.gain),
+                self.inter_re_a.eq(cm_a.re),
+                self.inter_im_a.eq(cm_a.im),
+                self.inter_ovfl_a.eq(cm_a.re_overflow | cm_a.im_overflow),
+            ]
+            m.d.sync += [
+                cm_b.complex_in.eq(self.pol_b_in),
+                cm_b.gain.eq(self.gain),
+                self.inter_re_b.eq(cm_b.re),
+                self.inter_im_b.eq(cm_b.im),
+                self.inter_ovfl_b.eq(cm_b.re_overflow | cm_b.im_overflow),
+            ]
 
-                # If we've counted to the end, reset
-                with m.If(self.chan_count == self.channels - 1):
-                    m.d.sync += self.chan_count.eq(0)
-                with m.Else():
-                    m.d.sync += self.chan_count.eq(self.chan_count + 1)
+            # Then grab the most significant bits and concat, im is LSB
+            out_a = Cat(
+                self.inter_im_a[-self.out_bits :], self.inter_re_a[-self.out_bits :]
+            )
+            out_b = Cat(
+                self.inter_im_b[-self.out_bits :], self.inter_re_b[-self.out_bits :]
+            )
 
-                # We'll assume that whatever is storing the gain values is
-                # indexed by the `addr` field that we'll set (now)
-                m.d.comb += self.addr.eq(self.chan_count)
+            # And assign these on the next clock
+            m.d.sync += self.pol_a_out.eq(out_a)
+            m.d.sync += self.pol_b_out.eq(out_b)
 
-                # Perfom the multiplication
-                m.d.comb += [
-                    cm.cm_in.eq(self.requant_in),
-                    cm.gain.eq(self.gain),
-                    self.inter_re.eq(cm.re),
-                    self.inter_im.eq(cm.im),
-                ]
+            # Check the overflow bits, and OR them together
+            m.d.sync += self.pol_a_overflow.eq(self.inter_ovfl_a)
+            m.d.sync += self.pol_b_overflow.eq(self.inter_ovfl_b)
 
-                # Then grab the most significant bits and concat, im is LSB
-                out = Cat(
-                    self.inter_im[-self.out_bits :], self.inter_re[-self.out_bits :]
-                )
-
-                # And assign these on the next clock
-                m.d.sync += self.requant_out.eq(out)
-
-                # Check the overflow bits, and OR them together
-                m.d.sync += self.overflow.eq(cm.im_overflow | cm.re_overflow)
+            # And do the delays
+            m.d.sync += Cat(self.sync_out, self.sync_buf).eq(
+                Cat(self.sync_buf, self.sync_in)
+            )
 
         # Return module for elaboration
         return m

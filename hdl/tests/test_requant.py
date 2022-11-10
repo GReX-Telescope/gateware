@@ -1,9 +1,10 @@
 from amaranth.sim import Simulator
-from gateware.requant import Requant, RequantState
+from gateware.requant import Requant
+
 
 def test_requant():
     # Create DUT
-    dut = Requant(8,4,4)
+    dut = Requant(8, 4, 4)
 
     # Setup the simulation
     sim = Simulator(dut)
@@ -12,40 +13,48 @@ def test_requant():
     def process():
         # Setup and check initial state transitions
         yield dut.ce.eq(1)
-        yield dut.arm.eq(1)
-        assert (yield dut.state) == RequantState.WaitArm.value
-        yield
-        yield dut.arm.eq(0)
         yield dut.sync_in.eq(1)
         yield
         yield dut.sync_in.eq(0)
-        assert (yield dut.state) == RequantState.WaitSync.value
         # Try to move the LSB of the input to the output
         yield dut.gain.eq(16)
-        yield dut.requant_in.eq(0b00000001_00000001)
+        yield dut.pol_a_in.eq(0b00000001_00000001)  # => 0b0001_0001
+        yield dut.pol_b_in.eq(0b00000001_00000001)  # => 0b0001_0001
         yield
-        assert (yield dut.state) == RequantState.Running.value
-        # At this point, the addr selector should be on zero
         assert (yield dut.addr) == 0
-        # And sync_out should be high as the next clock will contain the valid data
-        assert (yield dut.sync_out)
-        # Now we'll set a new gain, input, and output for the next cycle
-        yield dut.requant_in.eq(0b11111110_11111110)
         yield dut.gain.eq(1)
+        yield dut.pol_a_in.eq(0b11111110_11111110)  # => 0b1111_1111
+        yield dut.pol_b_in.eq(0b11000000_10010000)  # => 0b1100_1001
         yield
-        # On this cyle, we should have 1,1
-        assert (yield dut.requant_out) == 0b0001_0001
-        # And be selecting the the second address
         assert (yield dut.addr) == 1
-        # And now set the gain too high to show clamping
-        yield dut.gain.eq(3)
-        yield dut.requant_in.eq(0b01000000_10000000)
+        yield dut.gain.eq(2)
+        yield dut.pol_a_in.eq(0b00010000_00010000)  # => 0b0010_0010
+        yield dut.pol_b_in.eq(0b01010101_10101010)  # => 0b0111_1000
         yield
-        assert (yield dut.requant_out) == 0b1111_1111
+        assert (yield dut.addr) == 2
+        # Now the gain 3 is set, we could pipeline in a 4th and 5th input
         yield
-        assert (yield dut.overflow)
-        assert (yield dut.requant_out) == 0b0111_1000
-
+        assert (yield dut.addr) == 3
+        yield
+        # This is where the sync out should be
+        assert (yield dut.addr) == 0
+        assert (yield dut.sync_out)
+        yield
+        # And this is the beginning of valid data
+        assert (yield dut.pol_a_out) == 0b0001_0001
+        assert (yield dut.pol_b_out) == 0b0001_0001
+        assert not (yield dut.pol_a_overflow)
+        assert not (yield dut.pol_b_overflow)
+        yield
+        assert (yield dut.pol_a_out) == 0b1111_1111
+        assert (yield dut.pol_b_out) == 0b1100_1001
+        assert not (yield dut.pol_a_overflow)
+        assert not (yield dut.pol_b_overflow)
+        yield
+        assert (yield dut.pol_a_out) == 0b0010_0010
+        assert (yield dut.pol_b_out) == 0b0111_1000
+        assert not (yield dut.pol_a_overflow)
+        assert (yield dut.pol_b_overflow)
 
     # Tell the simulation about the process and the waveform context to run
     sim.add_sync_process(process)

@@ -15,5 +15,4 @@ hdl/.venv
 hdl/.pytest_cache
 hdl/artifacts/*.vcd
 hdl/artifacts/*.gtkw
-hdl/artifacts/*.v
 *__pycache__

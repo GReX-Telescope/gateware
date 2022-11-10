@@ -1,44 +1,56 @@
-function packetizer_config(this_block)
+function requant_config(this_block)
   this_block.setTopLevelLanguage('Verilog');
-  this_block.setEntityName('packetizer');
-
+  this_block.setEntityName('requant');
   this_block.tagAsCombinational;
 
-  this_block.addSimulinkInport('arm');
-  this_block.addSimulinkInport('pol_a');
-  this_block.addSimulinkInport('pol_b');
+  this_block.addSimulinkInport('gain');
+  this_block.addSimulinkInport('pol_a_in');
+  this_block.addSimulinkInport('pol_b_in');
   this_block.addSimulinkInport('rst');
   this_block.addSimulinkInport('sync_in');
 
-  this_block.addSimulinkOutport('tx_data');
-  this_block.addSimulinkOutport('tx_eof');
-  this_block.addSimulinkOutport('tx_valid');
+  this_block.addSimulinkOutport('addr');
+  this_block.addSimulinkOutport('pol_a_overflow');
+  this_block.addSimulinkOutport('pol_b_overflow');
+  this_block.addSimulinkOutport('pol_a_out');
+  this_block.addSimulinkOutport('pol_b_out');
+  this_block.addSimulinkOutport('sync_out');
 
-  tx_data_port = this_block.port('tx_data');
-  tx_data_port.setType('UFix_64_0');
-  tx_eof_port = this_block.port('tx_eof');
-  tx_eof_port.setType('Bool');
-  tx_eof_port.useHDLVector(false);
-  tx_valid_port = this_block.port('tx_valid');
-  tx_valid_port.setType('Bool');
-  tx_valid_port.useHDLVector(false);
+  addr_port = this_block.port('addr');
+  addr_port.setType('UFix_11_0');
+  
+  overflow_a_port = this_block.port('pol_a_overflow');
+  overflow_a_port.setType('Bool');
+  overflow_a_port.useHDLVector(false);
+  
+  overflow_b_port = this_block.port('pol_b_overflow');
+  overflow_b_port.setType('Bool');
+  overflow_b_port.useHDLVector(false);
+  
+  pol_a_out_port = this_block.port('pol_a_out');
+  pol_a_out_port.setType('UFix_16_0');
+  
+  pol_b_out_port = this_block.port('pol_b_out');
+  pol_b_out_port.setType('UFix_16_0');
+  
+  sync_out_port = this_block.port('sync_out');
+  sync_out_port.setType('Bool');
+  sync_out_port.useHDLVector(false);
 
   % -----------------------------
   if (this_block.inputTypesKnown)
     % do input type checking, dynamic output type and generic setup in this code block.
 
-    if (this_block.port('arm').width ~= 1)
-      this_block.setError('Input data type for port "arm" must have width=1.');
+    if (this_block.port('gain').width ~= 11)
+      this_block.setError('Input data type for port "gain" must have width=11.');
     end
 
-    this_block.port('arm').useHDLVector(false);
-
-    if (this_block.port('pol_a').width ~= 16)
-      this_block.setError('Input data type for port "pol_a" must have width=16.');
+    if (this_block.port('pol_a_in').width ~=36)
+      this_block.setError('Input data type for port "pol_a_in" must have width=36.');
     end
-
-    if (this_block.port('pol_b').width ~= 16)
-      this_block.setError('Input data type for port "pol_b" must have width=16.');
+    
+    if (this_block.port('pol_b_in').width ~=36)
+      this_block.setError('Input data type for port "pol_b_in" must have width=36.');
     end
 
     if (this_block.port('rst').width ~= 1)
@@ -63,8 +75,7 @@ function packetizer_config(this_block)
   % -----------------------------
 
     uniqueInputRates = unique(this_block.getInputRates);
-
-  this_block.addFile('hdl/artifacts/packetizer.v');
+  this_block.addFile('hdl/artifacts/requant.v');
 
 return;
 

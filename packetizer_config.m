@@ -4,21 +4,20 @@ function packetizer_config(this_block)
 
   this_block.tagAsCombinational;
 
-  this_block.addSimulinkInport('arm');
   this_block.addSimulinkInport('pol_a');
   this_block.addSimulinkInport('pol_b');
   this_block.addSimulinkInport('rst');
-  this_block.addSimulinkInport('sync_in');
+  this_block.addSimulinkInport('sync');
 
   this_block.addSimulinkOutport('tx_data');
-  this_block.addSimulinkOutport('tx_eof');
+  this_block.addSimulinkOutport('tx_eod');
   this_block.addSimulinkOutport('tx_valid');
 
   tx_data_port = this_block.port('tx_data');
   tx_data_port.setType('UFix_64_0');
-  tx_eof_port = this_block.port('tx_eof');
-  tx_eof_port.setType('Bool');
-  tx_eof_port.useHDLVector(false);
+  tx_eod_port = this_block.port('tx_eod');
+  tx_eod_port.setType('Bool');
+  tx_eod_port.useHDLVector(false);
   tx_valid_port = this_block.port('tx_valid');
   tx_valid_port.setType('Bool');
   tx_valid_port.useHDLVector(false);
@@ -26,13 +25,6 @@ function packetizer_config(this_block)
   % -----------------------------
   if (this_block.inputTypesKnown)
     % do input type checking, dynamic output type and generic setup in this code block.
-
-    if (this_block.port('arm').width ~= 1)
-      this_block.setError('Input data type for port "arm" must have width=1.');
-    end
-
-    this_block.port('arm').useHDLVector(false);
-
     if (this_block.port('pol_a').width ~= 16)
       this_block.setError('Input data type for port "pol_a" must have width=16.');
     end
@@ -47,11 +39,11 @@ function packetizer_config(this_block)
 
     this_block.port('rst').useHDLVector(false);
 
-    if (this_block.port('sync_in').width ~= 1)
-      this_block.setError('Input data type for port "sync_in" must have width=1.');
+    if (this_block.port('sync').width ~= 1)
+      this_block.setError('Input data type for port "sync" must have width=1.');
     end
 
-    this_block.port('sync_in').useHDLVector(false);
+    this_block.port('sync').useHDLVector(false);
 
   end  % if(inputTypesKnown)
   % -----------------------------
@@ -64,6 +56,7 @@ function packetizer_config(this_block)
 
     uniqueInputRates = unique(this_block.getInputRates);
 
+  this_block.addFile('hdl/artifacts/fifo.v');
   this_block.addFile('hdl/artifacts/packetizer.v');
 
 return;

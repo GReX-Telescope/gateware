@@ -152,8 +152,15 @@ module packetizer (
 	always @(posedge clk)
 		if (rst)
 			tx_data <= 0;
-		else if ((fifo_state == 3'd1) && (fifo_r_count == 0))
-			tx_data <= payload_id;
+		else if ((fifo_state == 3'd1) && (fifo_r_count == 0)) begin : sv2v_autoblock_1
+			reg [63:0] _sv2v_strm_273D2_inp;
+			reg [63:0] _sv2v_strm_273D2_out;
+			integer _sv2v_strm_273D2_idx;
+			_sv2v_strm_273D2_inp = {payload_id};
+			for (_sv2v_strm_273D2_idx = 0; _sv2v_strm_273D2_idx <= 56; _sv2v_strm_273D2_idx = _sv2v_strm_273D2_idx + 8)
+				_sv2v_strm_273D2_out[63 - _sv2v_strm_273D2_idx-:8] = _sv2v_strm_273D2_inp[_sv2v_strm_273D2_idx+:8];
+			tx_data <= _sv2v_strm_273D2_out << 0;
+		end
 		else if ((fifo_state == 3'd1) || (fifo_state == 3'd2))
 			tx_data <= fifo_a_dout;
 		else if ((fifo_state == 3'd3) || (fifo_state == 3'd4))

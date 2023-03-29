@@ -200,9 +200,10 @@ module packetizer (
   end
 
   // Dump FIFO outputs (tricky)
+  // Convert payload_id to LE for destructing help
   always_ff @(posedge clk) begin
     if (rst) tx_data <= 0;
-    else if ((fifo_state == dump_a) && (fifo_r_count == 0)) tx_data <= payload_id;
+    else if ((fifo_state == dump_a) && (fifo_r_count == 0)) tx_data <= {<<8{payload_id}};
     else if ((fifo_state == dump_a) || (fifo_state == last_a)) tx_data <= fifo_a_dout;
     else if ((fifo_state == dump_b) || (fifo_state == last_b)) tx_data <= fifo_b_dout;
     else tx_data <= 0;

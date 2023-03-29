@@ -1,5 +1,3 @@
-`default_nettype none
-
 module fifo #(
     parameter integer DATA_WIDTH = 64,
     parameter integer DEPTH = 1024
@@ -23,49 +21,33 @@ module fifo #(
   parameter integer WIDTH = $clog2(DEPTH);
   logic [WIDTH-1:0] waddr;
   logic [WIDTH-1:0] raddr;
-  // State
-  integer counter = 0;
 
   // Signals
   always_comb begin
-    full  = (counter == DEPTH);
-    empty = (counter == 0);
-  end
-
-  // Counter logic
-  always_ff @(posedge clk, posedge rst) begin
-    if (rst) counter <= 0;  // Initial condition
-    else if ((!full && we) && (!empty && re)) counter <= counter;  // Reading and writing
-    else if ((!full && we)) counter <= counter + 1;  // Writing
-    else if ((!empty && re)) counter <= counter - 1;  // Reading
-    else counter <= counter;  // Fallback
+    full  = (waddr + 1'b1 == raddr);
+    empty = (waddr == raddr);
   end
 
   // Read and write
-  always_ff @(posedge clk, posedge rst) begin
-    if (rst) mem <= '{default: '0};
-    else begin
-      // Read
-      if (!empty && re) dout <= mem[raddr];
-      else dout <= dout;
-      // Write
-      if (!full && we) mem[waddr] <= din;
-      else mem[waddr] <= mem[waddr];
-    end
+  always_ff @(posedge clk) begin
+    // Read
+    if (!empty && re) dout <= mem[raddr];
+    else if (!rst) dout <= dout;
+    else dout <= 0;
+    // Write
+    if (!full && we) mem[waddr] <= din;
+    else mem[waddr] <= mem[waddr];
   end
 
   // Address movements
-  always_ff @(posedge clk, posedge rst) begin
-    if (rst) begin
-      waddr <= 0;
-      raddr <= 0;
-    end else begin
-      // Write ptr
-      if (!full && we) waddr <= waddr + 1;
-      else waddr <= waddr;
-      // Read ptr
-      if (!empty && re) raddr <= raddr + 1;
-      else raddr <= raddr;
-    end
+  always_ff @(posedge clk) begin
+    // Write ptr
+    if (rst) waddr <= 0;
+    else if (!full && we) waddr <= waddr + 1;
+    else waddr <= waddr;
+    // Read ptr
+    if (rst) raddr <= 0;
+    else if (!empty && re) raddr <= raddr + 1;
+    else raddr <= raddr;
   end
 endmodule

@@ -1,5 +1,3 @@
-`default_nettype none
-
 // FSM States
 typedef enum logic {
   wait_sync,
@@ -36,7 +34,7 @@ module packetizer (
     // Standard cell inputs
     input logic clk,  // Clock
     input logic ce,   // Clock enable
-    input logic rst,  // Asynchronous reset
+    input logic rst,  // Synchronous reset
 
     // Packetizer Inputs
     input data_word_t pol_a,
@@ -81,7 +79,7 @@ module packetizer (
 
   // FIFO sizes figured out experimentally
   fifo #(
-      .DEPTH(513)
+      .DEPTH(1024)
   ) fifo_a (
       .clk(clk),
       .rst(rst),
@@ -93,7 +91,7 @@ module packetizer (
       .full()
   );
   fifo #(
-      .DEPTH(641)
+      .DEPTH(1024)
   ) fifo_b (
       .clk(clk),
       .rst(rst),
@@ -108,7 +106,7 @@ module packetizer (
   // ---- FIFO Infill
 
   // State updates
-  always_ff @(posedge clk, posedge rst) begin
+  always_ff @(posedge clk) begin
     if (rst) state <= wait_sync;
     else if (ce) state <= next_state;
     else state <= state;
@@ -121,7 +119,7 @@ module packetizer (
   end
 
   // Subword counter
-  always_ff @(posedge clk, posedge rst) begin
+  always_ff @(posedge clk) begin
     if (rst) subword <= '0;
     // Initial transition after reset
     else if (ce && (state == wait_sync) && sync) subword <= 'd3;
@@ -130,20 +128,20 @@ module packetizer (
   end
 
   // First word detect
-  always_ff @(posedge clk, posedge rst) begin
+  always_ff @(posedge clk) begin
     if (rst) first_done <= 0;
     else if (ce && (state == running) && (subword == 0)) first_done <= 1;
     else first_done <= first_done;
   end
 
   // Fill packed left to right
-  always_ff @(posedge clk, posedge rst) begin
+  always_ff @(posedge clk) begin
     if (rst) packed_a <= '0;
     else if (ce && (state == running)) packed_a[16*subword+:16] <= pol_a;
     else packed_a <= packed_a;
   end
 
-  always_ff @(posedge clk, posedge rst) begin
+  always_ff @(posedge clk) begin
     if (rst) packed_b <= '0;
     else if (ce && (state == running)) packed_b[16*subword+:16] <= pol_b;
     else packed_b <= packed_b;
@@ -155,7 +153,7 @@ module packetizer (
     else fifo_we = 0;
   end
 
-  always_ff @(posedge clk, posedge rst) begin
+  always_ff @(posedge clk) begin
     if (rst) fifo_w_count <= '0;
     else if (ce && (state == running) && (subword == 0)) fifo_w_count <= fifo_w_count + 1;
     else fifo_w_count <= fifo_w_count;
@@ -164,7 +162,7 @@ module packetizer (
   // ----- FIFO Exfil
 
   // State updates
-  always_ff @(posedge clk, posedge rst) begin
+  always_ff @(posedge clk) begin
     if (rst) fifo_state <= loading;
     else if (ce && (state == running)) fifo_state <= next_fifo_state;
     else fifo_state <= fifo_state;
@@ -181,28 +179,28 @@ module packetizer (
   end
 
   // FIFO Read Counter
-  always_ff @(posedge clk, posedge rst) begin
+  always_ff @(posedge clk) begin
     if (rst) fifo_r_count <= 0;
     else if (fifo_state != loading) fifo_r_count <= fifo_r_count + 1;
     else fifo_r_count <= 0;
   end
 
   // Signal to read from a on transition
-  always_ff @(posedge clk, posedge rst) begin
+  always_ff @(posedge clk) begin
     if (rst) fifo_a_re <= 0;
     else if (next_fifo_state == dump_a) fifo_a_re <= 1;
     else fifo_a_re <= 0;
   end
 
   // Signal to read from b on transition
-  always_ff @(posedge clk, posedge rst) begin
+  always_ff @(posedge clk) begin
     if (rst) fifo_b_re <= 0;
     else if ((next_fifo_state == last_a) || (next_fifo_state == dump_b)) fifo_b_re <= 1;
     else fifo_b_re <= 0;
   end
 
   // Dump FIFO outputs (tricky)
-  always_ff @(posedge clk, posedge rst) begin
+  always_ff @(posedge clk) begin
     if (rst) tx_data <= 0;
     else if ((fifo_state == dump_a) && (fifo_r_count == 0)) tx_data <= payload_id;
     else if ((fifo_state == dump_a) || (fifo_state == last_a)) tx_data <= fifo_a_dout;
@@ -211,24 +209,23 @@ module packetizer (
   end
 
   // TX Valid
-  always_ff @(posedge clk, posedge rst) begin
+  always_ff @(posedge clk) begin
     if (rst) tx_valid <= 0;
     else if (fifo_state != loading) tx_valid <= 1;
     else tx_valid <= 0;
   end
 
   // TX EOD
-  always_ff @(posedge clk, posedge rst) begin
+  always_ff @(posedge clk) begin
     if (rst) tx_eod <= 0;
     else if (fifo_state == last_b) tx_eod <= 1;
     else tx_eod <= 0;
   end
 
   // Payload counter
-  always_ff @(posedge clk, posedge rst) begin
+  always_ff @(posedge clk) begin
     if (rst) payload_id <= 0;
     else if (tx_eod) payload_id <= payload_id + 1;
     else payload_id <= payload_id;
   end
-
 endmodule

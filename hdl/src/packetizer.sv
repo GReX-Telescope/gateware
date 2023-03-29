@@ -58,15 +58,15 @@ module packetizer (
   packet_word_t payload_id = 0;
 
   // In progress packed words
-  packet_word_t packed_a = '0;
-  packet_word_t packed_b = '0;
-  logic [1:0] subword = '0;
+  packet_word_t packed_a = 0;
+  packet_word_t packed_b = 0;
+  logic [1:0] subword = 0;
 
   // FIFOs will write together
   logic fifo_we;
   // Counters for infill and exfill progress
-  logic [8:0] fifo_w_count = '0;
-  logic [10:0] fifo_r_count = '0;
+  logic [8:0] fifo_w_count = 0;
+  logic [10:0] fifo_r_count = 0;
 
   // Two FIFOs, one for each polarization
   logic fifo_a_re;
@@ -120,7 +120,7 @@ module packetizer (
 
   // Subword counter
   always_ff @(posedge clk) begin
-    if (rst) subword <= '0;
+    if (rst) subword <= 0;
     // Initial transition after reset
     else if (ce && (state == wait_sync) && sync) subword <= 'd3;
     else if (ce && (state == running)) subword <= subword - 1;
@@ -136,13 +136,13 @@ module packetizer (
 
   // Fill packed left to right
   always_ff @(posedge clk) begin
-    if (rst) packed_a <= '0;
+    if (rst) packed_a <= 0;
     else if (ce && (state == running)) packed_a[16*subword+:16] <= pol_a;
     else packed_a <= packed_a;
   end
 
   always_ff @(posedge clk) begin
-    if (rst) packed_b <= '0;
+    if (rst) packed_b <= 0;
     else if (ce && (state == running)) packed_b[16*subword+:16] <= pol_b;
     else packed_b <= packed_b;
   end
@@ -154,7 +154,7 @@ module packetizer (
   end
 
   always_ff @(posedge clk) begin
-    if (rst) fifo_w_count <= '0;
+    if (rst) fifo_w_count <= 0;
     else if (ce && (state == running) && (subword == 0)) fifo_w_count <= fifo_w_count + 1;
     else fifo_w_count <= fifo_w_count;
   end
@@ -205,7 +205,7 @@ module packetizer (
     else if ((fifo_state == dump_a) && (fifo_r_count == 0)) tx_data <= payload_id;
     else if ((fifo_state == dump_a) || (fifo_state == last_a)) tx_data <= fifo_a_dout;
     else if ((fifo_state == dump_b) || (fifo_state == last_b)) tx_data <= fifo_b_dout;
-    else tx_data <= '0;
+    else tx_data <= 0;
   end
 
   // TX Valid

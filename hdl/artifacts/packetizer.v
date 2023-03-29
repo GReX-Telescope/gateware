@@ -22,12 +22,12 @@ module packetizer (
 	reg next_state;
 	reg first_done = 0;
 	reg [63:0] payload_id = 0;
-	reg [63:0] packed_a = 1'sb0;
-	reg [63:0] packed_b = 1'sb0;
-	reg [1:0] subword = 1'sb0;
+	reg [63:0] packed_a = 0;
+	reg [63:0] packed_b = 0;
+	reg [1:0] subword = 0;
 	reg fifo_we;
-	reg [8:0] fifo_w_count = 1'sb0;
-	reg [10:0] fifo_r_count = 1'sb0;
+	reg [8:0] fifo_w_count = 0;
+	reg [10:0] fifo_r_count = 0;
 	reg fifo_a_re;
 	reg fifo_b_re;
 	wire [63:0] fifo_a_dout;
@@ -68,7 +68,7 @@ module packetizer (
 			next_state = state;
 	always @(posedge clk)
 		if (rst)
-			subword <= 1'sb0;
+			subword <= 0;
 		else if ((ce && (state == 1'd0)) && sync)
 			subword <= 'd3;
 		else if (ce && (state == 1'd1))
@@ -84,14 +84,14 @@ module packetizer (
 			first_done <= first_done;
 	always @(posedge clk)
 		if (rst)
-			packed_a <= 1'sb0;
+			packed_a <= 0;
 		else if (ce && (state == 1'd1))
 			packed_a[16 * subword+:16] <= pol_a;
 		else
 			packed_a <= packed_a;
 	always @(posedge clk)
 		if (rst)
-			packed_b <= 1'sb0;
+			packed_b <= 0;
 		else if (ce && (state == 1'd1))
 			packed_b[16 * subword+:16] <= pol_b;
 		else
@@ -103,7 +103,7 @@ module packetizer (
 			fifo_we = 0;
 	always @(posedge clk)
 		if (rst)
-			fifo_w_count <= 1'sb0;
+			fifo_w_count <= 0;
 		else if ((ce && (state == 1'd1)) && (subword == 0))
 			fifo_w_count <= fifo_w_count + 1;
 		else
@@ -159,7 +159,7 @@ module packetizer (
 		else if ((fifo_state == 3'd3) || (fifo_state == 3'd4))
 			tx_data <= fifo_b_dout;
 		else
-			tx_data <= 1'sb0;
+			tx_data <= 0;
 	always @(posedge clk)
 		if (rst)
 			tx_valid <= 0;

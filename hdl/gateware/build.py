@@ -1,7 +1,6 @@
 """The instantiation of the blocks to be embedded in the Simulink model.
 """
 
-from gateware.packetizer import Packetizer
 from gateware.requant import Requant
 from amaranth.back import verilog
 
@@ -14,23 +13,12 @@ IN_BITS = 18
 OUT_BITS = 8
 
 # Setup the modules
-PACKETIZER = Packetizer(N_WORDS)
 REQUANT = Requant(IN_BITS, OUT_BITS, CHANNELS)
-
 
 def build():
     """Build the verilog output to give to Simulink"""
 
     # Generate the verilog
-    with open("artifacts/packetizer.v", "w") as f:
-        f.write(
-            verilog.convert(
-                PACKETIZER,
-                ports=PACKETIZER.ports(),
-                name="packetizer",
-            )
-        )
-
     with open("artifacts/requant.v", "w") as f:
         f.write(
             verilog.convert(

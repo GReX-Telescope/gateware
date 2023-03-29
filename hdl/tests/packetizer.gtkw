@@ -1,0 +1,81 @@
+[*]
+[*] GTKWave Analyzer v3.3.114 (w)1999-2023 BSI
+[*] Tue Mar 28 23:26:11 2023
+[*]
+[dumpfile] "/home/kiran/Dropbox/Projects/SystemVerilog/GReX/build/traces/packetizer.vcd"
+[dumpfile_mtime] "Tue Mar 28 23:25:33 2023"
+[dumpfile_size] 4671325
+[savefile] "/home/kiran/Dropbox/Projects/SystemVerilog/GReX/tests/packetizer.gtkw"
+[timestart] 0
+[size] 2560 1356
+[pos] -1 -1
+*-11.704277 3591 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] TOP.
+[treeopen] TOP.packetizer.
+[treeopen] TOP.packetizer.fifo_a.
+[sst_width] 209
+[signals_width] 356
+[sst_expanded] 1
+[sst_vpaned_height] 417
+@28
+TOP.packetizer.clk
+TOP.packetizer.rst
+TOP.packetizer.ce
+TOP.packetizer.sync
+TOP.packetizer.state
+@200
+-
+@22
+TOP.packetizer.pol_a[15:0]
+TOP.packetizer.pol_b[15:0]
+@200
+-
+@8028
+TOP.packetizer.subword[1:0]
+@22
+TOP.packetizer.packed_a[63:0]
+TOP.packetizer.packed_b[63:0]
+@200
+-
+@28
+TOP.packetizer.fifo_we
+@8024
+TOP.packetizer.fifo_w_count[8:0]
+@28
+TOP.packetizer.first_done
+@200
+-
+@28
+TOP.packetizer.fifo_state[2:0]
+TOP.packetizer.next_fifo_state[2:0]
+@200
+-
+@24
+TOP.packetizer.fifo_r_count[10:0]
+@28
+TOP.packetizer.fifo_a_re
+TOP.packetizer.valid_a
+TOP.packetizer.fifo_b_re
+TOP.packetizer.valid_b
+@200
+-
+@8024
+TOP.packetizer.fifo_a.counter[31:0]
+TOP.packetizer.fifo_b.counter[31:0]
+@200
+-
+@22
+TOP.tx_data[63:0]
+@28
+TOP.tx_valid
+TOP.packetizer.tx_eod
+@22
+TOP.packetizer.payload_id[63:0]
+@200
+-
+@28
+TOP.packetizer.fifo_a.full
+@29
+TOP.packetizer.fifo_b.full
+[pattern_trace] 1
+[pattern_trace] 0

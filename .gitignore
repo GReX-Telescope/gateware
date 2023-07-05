@@ -16,3 +16,4 @@ hdl/.pytest_cache
 hdl/artifacts/*.vcd
 hdl/artifacts/*.gtkw
 *__pycache__
+.cache

@@ -25,9 +25,10 @@ pip3 install -r mlib_devel/requirements.txt
 
 ### External HDL
 
-Simulink gives me cancer, so I wrote some blocks in the excellent [Amaranth HDL](https://github.com/amaranth-lang/amaranth).
-I'm including the "compiled" verilog in this repo, but one can regenerate it by installing amaranth and running the python
-files in the `hdl` folder.
+Simulink gives me cancer, so I wrote some blocks in SystemVerilog.
+I'm including the "translated" verilog in this repo, but one can regenerate it by running `build_verilog.sh` in the `hdl` directory.
+This requires the [sv2v](https://github.com/zachjs/sv2v) program to be on the path. Complain to Mathworks that their expensive software
+doesn't support the verilog standard from over 2 decades ago.
 
 
 ### Compile

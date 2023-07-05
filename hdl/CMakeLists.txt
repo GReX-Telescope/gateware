@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 3.26)
+cmake_minimum_required(VERSION 3.25)
 project(GReXHDL)
 find_package(verilator)
-set(VERILATOR_ARGS -O3 -j 0 --x-assign fast --x-initial fast --noassert -Wall -Wno-PINCONNECTEMPTY)
+set(VERILATOR_ARGS -O3 -j 4 --x-assign fast --x-initial fast --noassert -Wall -Wno-PINCONNECTEMPTY)
 
 add_executable(Vpacketizer tests/sim_packetizer.cpp)
 verilate(Vpacketizer 
@@ -12,4 +12,9 @@ verilate(Vpacketizer
 add_executable(Vfifo tests/sim_fifo.cpp)
 verilate(Vfifo 
     SOURCES src/fifo.sv
+    TRACE THREADS)
+
+add_executable(Vrequant tests/sim_requant.cpp)
+verilate(Vrequant 
+    SOURCES src/requant.sv
     TRACE THREADS)

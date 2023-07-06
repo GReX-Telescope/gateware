@@ -18,3 +18,8 @@ add_executable(Vrequant tests/sim_requant.cpp)
 verilate(Vrequant 
     SOURCES src/requant.sv
     TRACE THREADS)
+
+add_executable(Vvacc tests/sim_vacc.cpp)
+verilate(Vvacc 
+    SOURCES src/vacc.sv
+    TRACE THREADS)

@@ -8,10 +8,10 @@ typedef enum logic [2:0] {
 } state_t;
 
 module vacc #(
-    parameter integer ACCUMULATIONS = 3,  // 2^20 accumulations
-    parameter integer VECTOR_WIDTH  = 3,  // 2048 channels
-    parameter integer INPUT_WIDTH   = 3,  // 18 bits squared
-    parameter integer OUTPUT_WIDTH  = 32  // Lots of time
+    parameter integer ACCUMULATIONS = 1048576,  // 2^20 accumulations
+    parameter integer VECTOR_WIDTH  = 11,       // 2048 channels
+    parameter integer INPUT_WIDTH   = 36,       // 18 bits squared
+    parameter integer OUTPUT_WIDTH  = 128       // Handle the bit growth
 ) (
     // Standard preamble
     input logic clk,  // Clock
@@ -38,8 +38,15 @@ module vacc #(
   end
 
   // Bool that checks if we are about to start a new chunk of data
-  logic start = data_addr == (2 ** VECTOR_WIDTH) - 1;
-  logic finish = addr == (2 ** VECTOR_WIDTH) - 1;
+  logic start;
+  always_comb begin
+    start = data_addr == (2 ** VECTOR_WIDTH) - 1;
+  end
+
+  logic finish;
+  always_comb begin
+    finish = addr == (2 ** VECTOR_WIDTH) - 1;
+  end
 
   // State updates
   always_ff @(posedge clk) begin

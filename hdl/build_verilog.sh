@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
-# First convert sv to v
-sv2v src/fifo.sv -w artifacts/fifo.v
-sv2v src/packetizer.sv -w artifacts/packetizer.v
-sv2v src/requant.sv -w artifacts/requant.v
-sv2v src/vacc.sv -w artifacts/vacc.v
-sv2v src/dpram.sv -w artifacts/dpram.v
+# Call sv2v on every system verilog file in the src directory
+for file in src/*.sv; do
+    sv2v $file -w artifacts/$(basename $file .sv).v
+done

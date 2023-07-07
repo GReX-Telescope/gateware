@@ -9,10 +9,10 @@ module vacc (
 	we,
 	addr
 );
-	parameter integer ACCUMULATIONS = 3;
-	parameter integer VECTOR_WIDTH = 3;
-	parameter integer INPUT_WIDTH = 3;
-	parameter integer OUTPUT_WIDTH = 32;
+	parameter integer ACCUMULATIONS = 1048576;
+	parameter integer VECTOR_WIDTH = 11;
+	parameter integer INPUT_WIDTH = 36;
+	parameter integer OUTPUT_WIDTH = 128;
 	input wire clk;
 	input wire ce;
 	input wire rst;
@@ -31,8 +31,10 @@ module vacc (
 			data_addr <= data_addr + 1;
 		else
 			data_addr <= data_addr;
-	reg start = data_addr == ((2 ** VECTOR_WIDTH) - 1);
-	reg finish = addr == ((2 ** VECTOR_WIDTH) - 1);
+	reg start;
+	always @(*) start = data_addr == ((2 ** VECTOR_WIDTH) - 1);
+	reg finish;
+	always @(*) finish = addr == ((2 ** VECTOR_WIDTH) - 1);
 	integer accumulations;
 	always @(posedge clk)
 		if (rst)

@@ -37,11 +37,11 @@ int main() {
       posedge_cnt++;
 
       if (posedge_cnt == 15)
-        dut->sync_in = 1;
+        dut->sync = 1;
       else
-        dut->sync_in = 0;
+        dut->sync = 0;
 
-      if (posedge_cnt == 69)
+      if ((posedge_cnt == 69) || (posedge_cnt == 132))
         dut->trig = 1;
       else
         dut->trig = 0;

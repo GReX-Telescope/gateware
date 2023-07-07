@@ -21,5 +21,6 @@ verilate(Vrequant
 
 add_executable(Vvacc tests/sim_vacc.cpp)
 verilate(Vvacc 
-    SOURCES src/vacc.sv
+    SOURCES src/vacc.sv src/dpram.sv
+    PREFIX Vvacc
     TRACE THREADS)

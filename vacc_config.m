@@ -1,53 +1,49 @@
-function requant_config(this_block)
+function vacc_config(this_block)
   this_block.setTopLevelLanguage('Verilog');
-
-  this_block.setEntityName('requant');
-
+  this_block.setEntityName('vacc');
   this_block.addSimulinkInport('rst');
   this_block.addSimulinkInport('data_in');
-  this_block.addSimulinkInport('sync_in');
-  this_block.addSimulinkInport('gain');
-
+  this_block.addSimulinkInport('sync');
+  this_block.addSimulinkInport('trig');
   this_block.addSimulinkOutport('data_out');
-  this_block.addSimulinkOutport('sync_out');
+  this_block.addSimulinkOutport('we');
   this_block.addSimulinkOutport('addr');
-  this_block.addSimulinkOutport('ovfl');
 
-  sync_out_port = this_block.port('sync_out');
-  sync_out_port.setType('UFix_1_0');
-  sync_out_port.useHDLVector(false);
-  
-  ovfl_port = this_block.port('ovfl');
-  ovfl_port.setType('UFix_1_0');
-  ovfl_port.useHDLVector(false);
+  we_port = this_block.port('we');
+  we_port.setType('UFix_1_0');
+  we_port.useHDLVector(false);
   
   data_out_port = this_block.port('data_out');
-  data_out_port.setType('UFix_16_0');
+  data_out_port.setType('UFix_64_0');
   
   addr_port = this_block.port('addr');
-  addr_port.setType('UFix_12_0');
+  addr_port.setType('UFix_11_0');
 
   % -----------------------------
   if (this_block.inputTypesKnown)
     % do input type checking, dynamic output type and generic setup in this code block.
 
-    if (this_block.port('rst').width ~= 1)
+    if (this_block.port('rst').width ~= 1);
       this_block.setError('Input data type for port "rst" must have width=1.');
     end
+
     this_block.port('rst').useHDLVector(false);
     
-    if (this_block.port('data_in').width ~= 36)
-      this_block.setError('Input data type for port "data_in" must have width=36.');
+    if (this_block.port('data_in').width ~= 32);
+        this_block.setError('Input data type for port "data_in" must have width=32.');
     end
-    
-    if (this_block.port('sync_in').width ~= 1)
-      this_block.setError('Input data type for port "sync_in" must have width=1.');
+    if (this_block.port('sync').width ~= 1);
+      this_block.setError('Input data type for port "sync" must have width=1.');
     end
-    this_block.port('sync_in').useHDLVector(false);
-    
-    if (this_block.port('gain').width ~= 11)
-      this_block.setError('Input data type for port "gain" must have width=11.');
+
+    this_block.port('sync').useHDLVector(false);
+
+    if (this_block.port('trig').width ~= 1);
+      this_block.setError('Input data type for port "trig" must have width=1.');
     end
+
+    this_block.port('trig').useHDLVector(false);
+
   end  % if(inputTypesKnown)
   % -----------------------------
 
@@ -57,9 +53,19 @@ function requant_config(this_block)
    end  % if(inputRatesKnown)
   % -----------------------------
 
-  uniqueInputRates = unique(this_block.getInputRates);
-  
-  this_block.addFile('hdl/artifacts/requant.v');
+    uniqueInputRates = unique(this_block.getInputRates);
+
+  % (!) Custimize the following generic settings as appropriate. If any settings depend
+  %      on input types, make the settings in the "inputTypesKnown" code block.
+  %      The addGeneric function takes  3 parameters, generic name, type and constant value.
+  %      Supported types are boolean, real, integer and string.
+  this_block.addGeneric('ACCUMULATIONS','integer','262144');
+  this_block.addGeneric('VECTOR_WIDTH','integer','11');
+  this_block.addGeneric('INPUT_WIDTH','integer','32');
+  this_block.addGeneric('OUTPUT_WIDTH','integer','64');
+
+  this_block.addFile('hdl/artifacts/dpram.v');
+  this_block.addFile('hdl/artifacts/vacc.v');
 
 return;
 

@@ -22,7 +22,7 @@ module requant (
 	input wire [INPUT_WIDTH - OUTPUT_WIDTH:0] gain;
 	output reg [(2 * OUTPUT_WIDTH) - 1:0] data_out;
 	output reg sync_out;
-	output reg [$clog2(CHANNELS) - 1:0] addr;
+	output reg [$clog2(CHANNELS):0] addr;
 	output reg ovfl;
 	reg signed [INPUT_WIDTH - 1:0] in_re = 0;
 	reg signed [INPUT_WIDTH - 1:0] in_im = 0;

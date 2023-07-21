@@ -7,7 +7,7 @@
 #include <verilated_vcd_c.h>
 
 #define MODEL Vvacc
-#define MAX_SIM_TIME 4102
+#define MAX_SIM_TIME 2048 * 30
 
 vluint64_t sim_time = 0;
 vluint64_t posedge_cnt = 0;
@@ -29,7 +29,7 @@ int main() {
   // dut->data_in = 1;
   dut->trig = 0;
 
-  while (sim_time < 1024) {
+  while (sim_time < MAX_SIM_TIME) {
     dut->clk ^= 1; // Invert clock
     dut->eval();   // Evaluate DUT on this edge
     if (dut->clk == 1) {
@@ -41,12 +41,12 @@ int main() {
       else
         dut->sync = 0;
 
-      if ((posedge_cnt == 69) || (posedge_cnt == 132))
+      if (posedge_cnt == 69)
         dut->trig = 1;
       else
         dut->trig = 0;
 
-      dut->data_in = posedge_cnt % 8;
+      dut->data_in = (posedge_cnt - 16) % 2048;
     }
 
     // Dump the waveform

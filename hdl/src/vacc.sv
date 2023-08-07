@@ -8,10 +8,10 @@ typedef enum logic [2:0] {
 } state_t;
 
 module vacc #(
-    parameter integer ACCUMULATIONS = 1048576,  // 2^20 accumulations
-    parameter integer VECTOR_WIDTH  = 11,       // 2048 channels
-    parameter integer INPUT_WIDTH   = 36,       // 18 bits squared
-    parameter integer OUTPUT_WIDTH  = 128       // Handle the bit growth
+    parameter integer ACCUMULATIONS = 8,
+    parameter integer VECTOR_WIDTH  = 11,  // 2048 channels
+    parameter integer INPUT_WIDTH   = 36,  // 18 bits squared
+    parameter integer OUTPUT_WIDTH  = 64   // Handle the bit growth
 ) (
     // Standard preamble
     input logic clk,  // Clock
@@ -175,7 +175,7 @@ module vacc #(
   end
 
   always_comb begin
-    if (ce && (state == draining)) begin
+    if (ce && (state == draining) && we) begin
       data_out = out_b;
     end else begin
       data_out = 0;

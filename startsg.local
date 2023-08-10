@@ -1,6 +1,6 @@
-export XILINX_PATH=/opt/Xilinx/Vivado/2021.1
-export COMPOSER_PATH=/opt/Xilinx/Model_Composer/2021.1
-export MATLAB_PATH=/opt/MATLAB/R2021a
+export XILINX_PATH=/tools/Xilinx/Vivado/2021.1
+export COMPOSER_PATH=/tools/Xilinx/Model_Composer/2021.1
+export MATLAB_PATH=/usr/local/bin
 export PLATFORM=lin64
 export JASPER_BACKEND=vivado
 export CASPER_PYTHON_VENV_ON_START=casper_venv

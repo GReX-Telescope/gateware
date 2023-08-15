@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.25)
 project(GReXHDL)
 find_package(verilator)
-set(VERILATOR_ARGS -O3 -j 4 --x-assign fast --x-initial fast --noassert -Wall -Wno-PINCONNECTEMPTY)
+set(VERILATOR_ARGS -O3 -j 4 --x-assign fast --x-initial fast --noassert -Wno-PINCONNECTEMPTY)
 
 add_executable(Vpacketizer tests/sim_packetizer.cpp)
 verilate(Vpacketizer 

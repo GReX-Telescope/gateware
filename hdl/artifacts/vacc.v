@@ -2,6 +2,7 @@ module vacc (
 	clk,
 	ce,
 	rst,
+	acc_n,
 	data_in,
 	sync,
 	trig,
@@ -9,13 +10,13 @@ module vacc (
 	we,
 	addr
 );
-	parameter integer ACCUMULATIONS = 1048576;
 	parameter integer VECTOR_WIDTH = 11;
 	parameter integer INPUT_WIDTH = 36;
-	parameter integer OUTPUT_WIDTH = 128;
+	parameter integer OUTPUT_WIDTH = 64;
 	input wire clk;
 	input wire ce;
 	input wire rst;
+	input wire [31:0] acc_n;
 	input wire [INPUT_WIDTH - 1:0] data_in;
 	input wire sync;
 	input wire trig;
@@ -45,7 +46,7 @@ module vacc (
 			state <= 3'd2;
 		else if ((ce && (state == 3'd2)) && start)
 			state <= 3'd3;
-		else if ((ce && (state == 3'd3)) && (accumulations == ACCUMULATIONS))
+		else if ((ce && (state == 3'd3)) && (accumulations == acc_n))
 			state <= 3'd4;
 		else if ((ce && (state == 3'd4)) && finish)
 			state <= 3'd1;
@@ -157,7 +158,7 @@ module vacc (
 			addr_b = 0;
 		end
 	always @(*)
-		if (ce && (state == 3'd4))
+		if ((ce && (state == 3'd4)) && we)
 			data_out = out_b;
 		else
 			data_out = 0;

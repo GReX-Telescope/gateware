@@ -25,6 +25,7 @@ int main() {
   // Initial states for input wires
   dut->rst = false;
   dut->ce = true;
+  dut->acc_n = 8;
 
   // dut->data_in = 1;
   dut->trig = 0;

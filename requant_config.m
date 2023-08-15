@@ -25,7 +25,7 @@ function requant_config(this_block)
   data_out_port.setType('UFix_16_0');
   
   addr_port = this_block.port('addr');
-  addr_port.setType('UFix_12_0');
+  addr_port.setType('UFix_11_0');
 
   % -----------------------------
   if (this_block.inputTypesKnown)
